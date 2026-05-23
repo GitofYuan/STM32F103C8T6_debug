@@ -38,3 +38,4 @@ stm32f103c8t6_debug\gpio_control.o: ../Core/Inc/can.h
 stm32f103c8t6_debug\gpio_control.o: ..\BSP\device_control_gpio.h
 stm32f103c8t6_debug\gpio_control.o: ..\BSP\device_control_uart.h
 stm32f103c8t6_debug\gpio_control.o: ..\BSP\device_control_can.h
+stm32f103c8t6_debug\gpio_control.o: ..\BSP\device_control_adc.h

@@ -62,6 +62,13 @@ const osThreadAttr_t BSP_Task1_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for APL_Task1 */
+osThreadId_t APL_Task1Handle;
+const osThreadAttr_t APL_Task1_attributes = {
+  .name = "APL_Task1",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -70,6 +77,7 @@ const osThreadAttr_t BSP_Task1_attributes = {
 
 void StartDefaultTask(void *argument);
 void BSP_Task(void *argument);
+void APL_Task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -105,6 +113,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of BSP_Task1 */
   BSP_Task1Handle = osThreadNew(BSP_Task, NULL, &BSP_Task1_attributes);
+
+  /* creation of APL_Task1 */
+  APL_Task1Handle = osThreadNew(APL_Task, NULL, &APL_Task1_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -151,6 +162,24 @@ __weak void BSP_Task(void *argument)
     osDelay(1);
   }
   /* USER CODE END BSP_Task */
+}
+
+/* USER CODE BEGIN Header_APL_Task */
+/**
+* @brief Function implementing the APL_Task1 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_APL_Task */
+__weak void APL_Task(void *argument)
+{
+  /* USER CODE BEGIN APL_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END APL_Task */
 }
 
 /* Private application code --------------------------------------------------*/

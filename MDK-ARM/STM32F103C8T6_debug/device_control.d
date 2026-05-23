@@ -38,6 +38,7 @@ stm32f103c8t6_debug\device_control.o: ../Core/Inc/can.h
 stm32f103c8t6_debug\device_control.o: ..\BSP\device_control_gpio.h
 stm32f103c8t6_debug\device_control.o: ..\BSP\device_control_uart.h
 stm32f103c8t6_debug\device_control.o: ..\BSP\device_control_can.h
+stm32f103c8t6_debug\device_control.o: ..\BSP\device_control_adc.h
 stm32f103c8t6_debug\device_control.o: ..\BSP\device_control_global.h
 stm32f103c8t6_debug\device_control.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 stm32f103c8t6_debug\device_control.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

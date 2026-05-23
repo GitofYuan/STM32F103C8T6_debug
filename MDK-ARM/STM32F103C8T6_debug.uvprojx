@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;..\BSP;..\MWL\can\can_bus;..\MWL\can\J1939;..\MWL\init;..\MWL\share_data;..\MWL\uart;..\APL</IncludePath>
+              <IncludePath>../Core/Inc; ../Drivers/STM32F1xx_HAL_Driver/Inc; ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy; ../Middlewares/Third_Party/FreeRTOS/Source/include; ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2; ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3; ../Drivers/CMSIS/Device/ST/STM32F1xx/Include; ../Drivers/CMSIS/Include; ..\BSP; ..\MWL\can\can_bus; ..\MWL\can\J1939; ..\MWL\init; ..\MWL\share_data; ..\MWL\uart; ..\APL</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -618,6 +618,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\can_control.c</FilePath>
             </File>
+            <File>
+              <FileName>adc_control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\adc_control.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -633,10 +638,37 @@
               <FileType>1</FileType>
               <FilePath>..\MWL\can\can_bus\can_bus.c</FilePath>
             </File>
+            <File>
+              <FileName>J1939.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MWL\can\J1939\J1939.c</FilePath>
+            </File>
+            <File>
+              <FileName>device_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MWL\init\device_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>share_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MWL\share_data\share_data.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>APL</GroupName>
+          <Files>
+            <File>
+              <FileName>can_protocol_handle.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APL\can_protocol_handle.c</FilePath>
+            </File>
+            <File>
+              <FileName>apl_tack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APL\apl_tack.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -657,5 +689,14 @@
     </components>
     <files/>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>STM32F103C8T6_debug</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

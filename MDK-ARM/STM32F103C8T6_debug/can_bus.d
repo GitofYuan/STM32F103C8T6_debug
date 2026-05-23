@@ -40,3 +40,4 @@ stm32f103c8t6_debug\can_bus.o: ../Core/Inc/usart.h
 stm32f103c8t6_debug\can_bus.o: ..\BSP\device_control_gpio.h
 stm32f103c8t6_debug\can_bus.o: ..\BSP\device_control_uart.h
 stm32f103c8t6_debug\can_bus.o: ..\BSP\device_control_can.h
+stm32f103c8t6_debug\can_bus.o: ..\BSP\device_control_adc.h

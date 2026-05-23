@@ -41,12 +41,4 @@ stm32f103c8t6_debug\uart_bus.o: ../Core/Inc/can.h
 stm32f103c8t6_debug\uart_bus.o: ..\BSP\device_control_gpio.h
 stm32f103c8t6_debug\uart_bus.o: ..\BSP\device_control_uart.h
 stm32f103c8t6_debug\uart_bus.o: ..\BSP\device_control_can.h
-stm32f103c8t6_debug\uart_bus.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
-stm32f103c8t6_debug\uart_bus.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
-stm32f103c8t6_debug\uart_bus.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-stm32f103c8t6_debug\uart_bus.o: ../Core/Inc/FreeRTOSConfig.h
-stm32f103c8t6_debug\uart_bus.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
-stm32f103c8t6_debug\uart_bus.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
-stm32f103c8t6_debug\uart_bus.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
-stm32f103c8t6_debug\uart_bus.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
-stm32f103c8t6_debug\uart_bus.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+stm32f103c8t6_debug\uart_bus.o: ..\BSP\device_control_adc.h

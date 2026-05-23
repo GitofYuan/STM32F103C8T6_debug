@@ -25,6 +25,7 @@
 #include "device_control_gpio.h"
 #include "device_control_uart.h"
 #include "device_control_can.h"
+#include "device_control_adc.h"
 /* ==============================  DEFINES   =============================== */
 #define MAX_DEVICE_CNT 32
 /* ==============================   ENUMS    =============================== */
@@ -37,6 +38,7 @@ typedef enum
     DEV_TYPE_CAN,     // CAN
     DEV_TYPE_I2C,     // I2C
     DEV_TYPE_SPI,     // SPI
+    DEV_TYPE_FLASH,   // Flash
     DEV_TYPE_UNKNOWN  // 未知外设
 } device_type_e;
 
@@ -85,10 +87,10 @@ typedef union
     /* CAN相关控制内容 */
     struct 
     {
-        uint32_t  id;            // CAN帧ID（READ/WRITE）
-        uint8_t   *data;         // CAN帧数据（READ/WRITE）
-        uint8_t   dlc;           // 数据长度（READ/WRITE）
-        uint32_t  baudrate;      // 波特率（CONFIG）
+        uint32_t         id;            // CAN帧ID（READ/WRITE）
+        uint8_t          *data;         // CAN帧数据（READ/WRITE）
+        uint8_t          dlc;           // 数据长度（READ/WRITE）
+        can_baud_rate_e  baudrate;      // 波特率（CONFIG）
     } can;
 
     // ADC相关控制内容

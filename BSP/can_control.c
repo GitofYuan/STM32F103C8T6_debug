@@ -152,7 +152,7 @@ bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, dev
 }
 
 /*****************************************************************************************************
-*Function   :HAL_UART_RxCpltCallback（串口接收完成回调函数重定义）
+*Function   :HAL_CAN_RxFifo0MsgPendingCallback（CAN接收完成回调函数重定义）
 *Description:
 *Input      :
 *Output     :
@@ -162,32 +162,25 @@ bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, dev
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan_t)
 {
 	CAN_RxHeaderTypeDef  pMycan_tx_Head;   /*接收的报文头信息*/
-	Can_Rcv_Data         g_can1_rcv;       /*报文接收数据（自定义结构体）*/
+	Can_Rcv_Data         g_can1_rcv;       /*报文接收数据（can_bus自定义结构体）*/
 	uint8_t              RxData[8];        /*报文内容*/
 	
 	if (hcan_t->Instance == hcan.Instance && HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &pMycan_tx_Head, RxData) == HAL_OK)
 	{
-//		#ifdef DEBUG_CAN
-//		printf("%08x:%02x %02x %02x %02x %02x %02x %02x %02x\n",pMycan_tx_Head.ExtId,\
-//		RxData[0],RxData[1],RxData[2],RxData[3],RxData[4],RxData[5],RxData[6],RxData[7]);
-//		#endif
-		
-    /*将接收到的报文头信息复制到全�?变量*/
-		g_can1_rcv.id = pMycan_tx_Head.ExtId;
-		g_can1_rcv.len = pMycan_tx_Head.DLC;
-		/*将接收到的数据复制到全局变量*/
-		for (int i = 0; i < 8; i++)
-		{
-			g_can1_rcv.data[i] = RxData[i];
-		}
+        /*将接收到的报文头信息复制到can_bus要求的结构体变量*/
+        g_can1_rcv.id = pMycan_tx_Head.ExtId;
+        g_can1_rcv.len = pMycan_tx_Head.DLC;
+        for (int i = 0; i < 8; i++)
+        {
+            g_can1_rcv.data[i] = RxData[i];
+        }
 
-		can_rx_enqueue(CAN_DATA_QUEUE_CHNL_1, &g_can1_rcv);
+        /*数据入队*/
+        can_rx_enqueue(CAN_DATA_QUEUE_CHNL_1, &g_can1_rcv);
 
-    /*重新使能接收中断*/
-    HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+        /*重新使能接收中断*/
+        HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
 	}
 }
-
-
 
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

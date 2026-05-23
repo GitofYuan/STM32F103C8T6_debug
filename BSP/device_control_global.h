@@ -38,5 +38,25 @@ bool gpio_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, de
 *****************************************************************************************************/
 bool uart_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content);
 
+/*****************************************************************************************************
+*Function   :
+*Description:
+*Input      :
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
+bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content);
+
+/*****************************************************************************************************
+*Function   :
+*Description:
+*Input      :
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
+bool adc_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content);
+
 #endif
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "uart_bus.h"
 
-#include "cmsis_os.h"
+
 /* ==============================  DEFINES   =============================== */
 
 /* ==============================   ENUMS    =============================== */
@@ -376,7 +376,7 @@ void uart_tx_dequeue(void)
         send_interval_timmer[chnl]++;
         if ((s_uart_tx_data_pointer[chnl].tail == NULL)
             ||(s_uart_tx_data_pointer[chnl].head == NULL)
-            ||(send_interval_timmer[chnl] < SEND_INTERVAL))   /*空队列或未到最小发送时间间隔*/
+            ||(send_interval_timmer[chnl] < UART_SEND_INTERVAL))   /*空队列或未到最小发送时间间隔*/
         {
             continue;
         }
@@ -426,19 +426,5 @@ void uart_tx_dequeue(void)
 //	return ch;
 //}
 
-void BSP_Task(void *argument)
-{
-  /* USER CODE BEGIN BSP_Task */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(500);
-      device_ctrl_content_u content;
-      content.gpio.level = GPIO_TOGGLE;
-      device_control(DEV_TYPE_GPIO, "run_led", DEV_CTRL_WRITE, &content);
-//      printf("debug\n");
-      uart_tx_dequeue();
-  }
-  /* USER CODE END BSP_Task */
-}
+
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

@@ -9,6 +9,7 @@
 
 /* ==============================  INCLUDES  =============================== */
 #include <string.h>
+#include <stdio.h>
 #include "J1939.h"
 /* ==============================  DEFINES   =============================== */
 #define TP_PRIORITY        7             /*TP类型报文优先级，含TPCM和TPDT*/
@@ -680,7 +681,7 @@ void send_j1939_tp_frame(CAN_CHNL chnl, TP_Role role, J1939_TP_STATUS tp_type, s
         /*如果是发送TPDT数据，一般是作为发送角色*/
         case TPDT:
             /*这里增加了一个取余过滤，是为了确保多帧数据传输与CAN_BUS出队频率一致，避免CAN_BUS拥堵而丢帧*/
-            if(j1939_tx_tp_msg[chnl].tp_timer[TIMER_TR].timer_num % SEND_INTERVAL)
+            if(j1939_tx_tp_msg[chnl].tp_timer[TIMER_TR].timer_num % CAN_SEND_INTERVAL)
             {
                 return;
             }

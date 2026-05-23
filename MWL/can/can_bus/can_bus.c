@@ -295,21 +295,23 @@ bool can_tx_enqueue(CAN_CHNL chnl, Can_Rcv_Data* data)
 /*****************************************************************************************************
 *Function   :can_send（CAN发送函数）
 *Description:按照输入的CAN通道和要发送的数据，进行数据头编辑，发送长度设置，然后调用相应的CAN通道将CAN数据发送出去。
-             如果发送失败则需要重新初始化CAN。
 *Input      :CAN_CHNL       chnl   CAN通道
              Can_Rcv_Data*  data   CAN发送数据结构体
 *Output     :
-*Returns    :
+*Returns    :bool ret       发送结果（true 成功/false 失败）
 *Note       :这个函数当前还没想好放在驱动层还是CAN_BUS。
 *****************************************************************************************************/
 bool can_send(CAN_CHNL chnl, Can_Rcv_Data* data)
 {
-    bool                 ret = false;        /*定义一个返回值*/
-    device_ctrl_content_u can_send_data;
+    bool                  ret = false;        /*定义一个返回值，默认为失败*/
+    device_ctrl_content_u can_send_data;      /*定义一个CAN发送数据结构体（驱动层定义结构体）*/
+
+    /*can数据结构题赋值*/
     can_send_data.can.id = data->id;
     can_send_data.can.dlc = data->len;
     can_send_data.can.data = data->data;
     
+    /*根据CAN通道调用相应的设备控制接口进行数据发送*/
     switch(chnl)
     {
         case CAN_DATA_QUEUE_CHNL_1:
@@ -342,7 +344,7 @@ void can_tx_dequeue(void)
         send_interval_timmer[chnl]++;
         if ((g_can_tx_data_pointer[chnl].tail == NULL)
             ||(g_can_tx_data_pointer[chnl].head == NULL)
-            ||(send_interval_timmer[chnl] < SEND_INTERVAL))   /*空队列或未到最小发送时间间隔*/
+            ||(send_interval_timmer[chnl] < CAN_SEND_INTERVAL))   /*空队列或未到最小发送时间间隔*/
         {
             continue;
         }

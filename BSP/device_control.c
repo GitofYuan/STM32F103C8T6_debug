@@ -48,90 +48,6 @@ static DeviceRuntimeInfo *find_device(device_type_e dev_type, const char *dev_na
     return NULL;
 }
 
-// ====================== ADC适配实现（简化版） ======================
-/*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
-*Output     :
-*Returns    :
-*Note       :
-*****************************************************************************************************/
-//static bool adc_stm32_init(const char *dev_name, void *init_config) {
-//    DeviceRuntimeInfo *dev = alloc_device_slot();
-//    if (dev == NULL) return false;
-
-//    // 绑定ADC硬件资源
-//    if (strcmp(dev_name, "ADC1_CH0") == 0) {
-//        dev->hw_res.adc.hadc = &hadc1;
-//        dev->hw_res.adc.channel = ADC_CHANNEL_0;
-//    } else if (strcmp(dev_name, "ADC1_CH1") == 0) {
-//        dev->hw_res.adc.hadc = &hadc1;
-//        dev->hw_res.adc.channel = ADC_CHANNEL_1;
-//    } else return false;
-
-//    // 初始化ADC（默认12位分辨率）
-//    ADC_HandleTypeDef *hadc = dev->hw_res.adc.hadc;
-//    hadc->Init.Resolution = ADC_RESOLUTION_12B;
-//    hadc->Init.ScanConvMode = DISABLE;
-//    hadc->Init.ContinuousConvMode = DISABLE;
-//    hadc->Init.DiscontinuousConvMode = DISABLE;
-//    hadc->Init.ExternalTrigConv = ADC_SOFTWARE_START;
-//    hadc->Init.DataAlign = ADC_DATAALIGN_RIGHT;
-//    hadc->Init.NbrOfConversion = 1;
-//    if (HAL_ADC_Init(hadc) != HAL_OK) {
-//        return false;
-//    }
-
-//    // 初始化设备状态
-//    dev->type = DEV_TYPE_ADC;
-//    strncpy(dev->name, dev_name, sizeof(dev->name)-1);
-//    dev->is_inited = true;
-//    dev->is_opened = true;
-//    return true;
-//}
-
-/*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
-*Output     :
-*Returns    :
-*Note       :
-*****************************************************************************************************/
-//static bool adc_stm32_control(DeviceRuntimeInfo *dev, Device_Ctrl_Type ctrl_type, DeviceCtrlContent *content) {
-//    if (dev == NULL || content == NULL) return false;
-
-//    ADC_HandleTypeDef *hadc = dev->hw_res.adc.hadc;
-//    switch (ctrl_type) {
-//        case DEV_CTRL_READ:
-//            // 读取ADC值，写入content->adc.adc_value
-//            HAL_ADC_Start(hadc);
-//            if (HAL_ADC_PollForConversion(hadc, 1000) == HAL_OK) {
-//                content->adc.adc_value = HAL_ADC_GetValue(hadc);
-//            } else {
-//                return false;
-//            }
-//            break;
-//        case DEV_CTRL_CONFIG:
-//            // 修改ADC分辨率
-//            hadc->Init.Resolution = (content->adc.resolution == 12) ? ADC_RESOLUTION_12B : ADC_RESOLUTION_10B;
-//            if (HAL_ADC_Init(hadc) != HAL_OK) return false;
-//            break;
-//        case DEV_CTRL_CALIBRATE:
-//            // ADC校准
-//            if (HAL_ADCEx_Calibration_Start(hadc) != HAL_OK) return false;
-//            content->adc.is_calibrated = true;
-//            break;
-//        case DEV_CTRL_GET_STATUS:
-//            content->adc.is_calibrated = true; // 简化：默认已校准
-//            break;
-//        default:
-//            return false;
-//    }
-//    return true;
-//}
-
 // ====================== 核心接口实现 ======================
 /*****************************************************************************************************
 *Function   :
@@ -163,9 +79,11 @@ bool device_control(device_type_e dev_type, const char *dev_name, device_ctrl_ty
             return gpio_stm32_control(dev, ctrl_type, content);
         case DEV_TYPE_UART:
             return uart_stm32_control(dev, ctrl_type, content);
+        case DEV_TYPE_CAN:
+            return can_stm32_control(dev, ctrl_type, content);
         case DEV_TYPE_ADC:
-//            return adc_stm32_control(dev, ctrl_type, content);
-        /* 可扩展CAN/I2C等外设 */
+            return adc_stm32_control(dev, ctrl_type, content);
+        /* 可扩展其他外设 */
         default:
             return false;
     }

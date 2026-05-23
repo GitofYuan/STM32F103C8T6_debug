@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include "can.h"
 /* ==============================  DEFINES   =============================== */
-#define SEND_INTERVAL           2     /*两帧之间发送的最小间隔 ms*/
+#define CAN_SEND_INTERVAL       2     /*两帧之间发送的最小间隔 ms*/
 #define CAN_DATA_QUEUE_NUM      10    /*CAN数据数据队列数量*/
 /*如果决定在CAN_BUS中对非自身地址和广播地址进行过滤，则要想好自身地址通过尽可能简单的方式传递进来*/
 #define CAN_CHNL_1_ADDR
