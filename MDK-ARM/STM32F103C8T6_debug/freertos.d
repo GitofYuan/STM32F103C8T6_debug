@@ -1,7 +1,7 @@
 stm32f103c8t6_debug\freertos.o: ../Core/Src/freertos.c
 stm32f103c8t6_debug\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-stm32f103c8t6_debug\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
-stm32f103c8t6_debug\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+stm32f103c8t6_debug\freertos.o: E:\Keil\ARM\ARMCC\Bin\..\include\stddef.h
+stm32f103c8t6_debug\freertos.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 stm32f103c8t6_debug\freertos.o: ../Core/Inc/FreeRTOSConfig.h
 stm32f103c8t6_debug\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 stm32f103c8t6_debug\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
@@ -42,7 +42,7 @@ stm32f103c8t6_debug\freertos.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ha
 stm32f103c8t6_debug\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
 stm32f103c8t6_debug\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
 stm32f103c8t6_debug\freertos.o: ..\BSP\device_control.h
-stm32f103c8t6_debug\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+stm32f103c8t6_debug\freertos.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdbool.h
 stm32f103c8t6_debug\freertos.o: ../Core/Inc/gpio.h
 stm32f103c8t6_debug\freertos.o: ../Core/Inc/usart.h
 stm32f103c8t6_debug\freertos.o: ../Core/Inc/can.h

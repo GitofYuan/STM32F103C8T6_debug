@@ -1,8 +1,8 @@
 stm32f103c8t6_debug\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c
-stm32f103c8t6_debug\stream_buffer.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-stm32f103c8t6_debug\stream_buffer.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+stm32f103c8t6_debug\stream_buffer.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdint.h
+stm32f103c8t6_debug\stream_buffer.o: E:\Keil\ARM\ARMCC\Bin\..\include\string.h
 stm32f103c8t6_debug\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-stm32f103c8t6_debug\stream_buffer.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+stm32f103c8t6_debug\stream_buffer.o: E:\Keil\ARM\ARMCC\Bin\..\include\stddef.h
 stm32f103c8t6_debug\stream_buffer.o: ../Core/Inc/FreeRTOSConfig.h
 stm32f103c8t6_debug\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 stm32f103c8t6_debug\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

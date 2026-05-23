@@ -41,7 +41,7 @@
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-static bool adc_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content) 
+bool adc_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content) 
 {
    if (dev == NULL || content == NULL)
    {
