@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "usart.h"
+#include "stm32f1xx.h"
 
 #include "device_control.h"
 #include "uart_bus.h"
@@ -23,7 +24,7 @@
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 
-static uint8_t huart_rx_buf[UART_DATA_MAX] = {0};           /*UART1接收缓冲区，大小根据实际需求定义*/
+static uint8_t uart1_rx_buf[UART_DATA_MAX] = {0};           /*UART1接收缓冲区，大小根据实际需求定义*/
 
 /* ========================= FUNCTION PROTOTYPES =========================== */
 
@@ -112,11 +113,13 @@ static bool uart_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *conte
     {
        case UART_MODE_IT_RX:
        case UART_MODE_IT_RX_TX:
-           HAL_UART_Receive_IT(huart, huart_rx_buf, UART_DATA_MAX);
+           HAL_UART_Receive_IT(huart, uart1_rx_buf, UART_DATA_MAX);
+           __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE); 
            break;
        case UART_MODE_DMA_RX:
        case UART_MODE_DMA_RX_TX:
-           HAL_UART_Receive_DMA(huart, huart_rx_buf, UART_DATA_MAX);
+           HAL_UART_Receive_DMA(huart, uart1_rx_buf, UART_DATA_MAX);
+           __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);
            break;
        default:
            return false;
@@ -237,53 +240,39 @@ bool uart_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, de
 }
 
 /*****************************************************************************************************
-*Function   :fputc
-*Description:prtinf函数
+*Function   :USART1_IRQHandler（UART1中断接收处理函数）
+*Description:原函数定义在stm32f1xx_it.c中，使用__weak将其修饰为弱函数，这里重定义覆盖它以实现UART1的空闲中断接收处理。
 *Input      :
 *Output     :
 *Returns    :
-*Note       :
+*Note       :原本使用__weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)是不对的，
+             因为这个回调函数是DMA接收完成的回调，而我们需要的是空闲中断的处理，
+             所以直接重定义USART1_IRQHandler来处理空闲中断更合适。
 *****************************************************************************************************/
-//int fputc(int ch,FILE *f)
-//{
-//	HAL_UART_Transmit(&huart1,(uint8_t *)&ch,1,0xFF);
-//	return ch;
-//}
-
-/*****************************************************************************************************
-*Function   :HAL_UART_RxCpltCallback（串口接收完成回调函数重定义）
-*Description:
-*Input      :
-*Output     :
-*Returns    :
-*Note       :待完善
-*****************************************************************************************************/
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void USART1_IRQHandler(void)
 {
-    if(huart == &huart1)
+    if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE) != RESET)
     {
-        __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_IDLE); /* 清除串口1的空闲中断标志 */
-		HAL_UART_DMAStop(&huart1); /* 停止串口1的DMA接收 */
-		uint8_t huart1_rx_len = UART_DATA_MAX -__HAL_DMA_GET_COUNTER(&hdma_usart1_rx); /* 计算接收到的数据长度 */
-		if(huart1_rx_len > 0 && huart1_rx_len <= UART_DATA_MAX)
-		{
+        __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_IDLE); /* 清除空闲中断标志 */
+        HAL_UART_DMAStop(&huart1); /* 停止DMA接收 */
+        uint8_t huart1_rx_len = UART_DATA_MAX - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); /* 计算接收到的数据长度 */
+        
+        if(huart1_rx_len > 0 && huart1_rx_len <= UART_DATA_MAX)
+        {
             uart_data_s huart1_rx_data;
             huart1_rx_data.len = huart1_rx_len;  /*用于计算有效数据长度*/
-            while(huart_rx_buf[huart1_rx_data.len-1] == 0)
+            while(uart1_rx_buf[huart1_rx_data.len-1] == 0)
             {
                 huart1_rx_data.len--;
             }
-            memcpy(huart1_rx_data.data, huart_rx_buf, huart1_rx_data.len);
+            memcpy(huart1_rx_data.data, uart1_rx_buf, huart1_rx_data.len);
 
             uart_rx_enqueue(UART_DATA_QUEUE_CHNL_1, &huart1_rx_data);
-		}
-		memset(huart_rx_buf, 0, UART_DATA_MAX);
-        
-		HAL_UART_Receive_DMA(&huart1, huart_rx_buf, UART_DATA_MAX); /* 重新启动DMA接收，准备下�?次数据接�? */
-        // 这里可以添加接收完成后的处理代码，例如设置标志位、解析数据等
+        }
+
+        HAL_UART_Receive_DMA(&huart1, uart1_rx_buf, UART_DATA_MAX); /* 重新启动DMA接收 */
     }
+    HAL_UART_IRQHandler(&huart1);
 }
-
-
 
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

@@ -41,16 +41,23 @@ void APL_Task(void *argument)
         can_protocol_handle_task();
         if(R485_tx_flag >= 500)
         {
-            uart_data_s data = {0};
-            data.len = snprintf((char*)R485_tx_buf, UART_DATA_MAX, "R485 test message %d", R485_tx_flag);
-            memcpy(data.data, R485_tx_buf, data.len);
-            data.timeout = data.len+1;
-            uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &data);
-            
-            printf("UART send failure,init again!\n");
+//            uart_data_s data = {0};
+//            data.len = snprintf((char*)R485_tx_buf, UART_DATA_MAX, "R485 test message %d", R485_tx_flag);
+//            memcpy(data.data, R485_tx_buf, data.len);
+//            data.timeout = data.len+1;
+//            uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &data);
+//            
+//            printf("UART send failure,init again!\n");
             R485_tx_flag = 0;
         }
         R485_tx_flag ++;
+
+        uart_data_s uart_rx_data = {0};
+        uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &uart_rx_data);
+        if(uart_rx_data.len > 0)
+        {
+            printf("Received UART data: %.*s\n", uart_rx_data.len, uart_rx_data.data);
+        }
     }
     /* USER CODE END APL_Task */
 }
