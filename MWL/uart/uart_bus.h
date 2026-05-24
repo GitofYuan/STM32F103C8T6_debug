@@ -16,11 +16,11 @@
 #include <stdbool.h>
 #include "device_control.h"
 /* ==============================  DEFINES   =============================== */
-#define UART_SEND_INTERVAL      10     /*两帧之间发送的最小间隔 ms*/
-#define UART_DATA_QUEUE_NUM     10     /*UART数据数据队列数量*/
+#define UART_SEND_INTERVAL      50     /*两帧之间发送的最小间隔 ms*/
+#define UART_DATA_QUEUE_NUM     5     /*UART数据数据队列数量*/
 #define UART_DATA_MAX           50    /*UART单次最大可收发字节数*/
 
-#define disDEBUG_UART_BUS            /*debug使能，完整保留“DEBUG_UART_BUS”为使能debug*/
+#define DEBUG_UART_BUS            /*debug使能，完整保留“DEBUG_UART_BUS”为使能debug*/
 /* ==============================   ENUMS    =============================== */
 /*UART通道枚举，如果实际用不到那么多UART通道，建议将用不到的UART通道注掉以节省资源*/
 typedef enum
@@ -36,7 +36,7 @@ typedef enum
 typedef struct
 {
     uint8_t     len;                          /*数据长度*/
-    uint8_t     *data;                        /*数据内容指针*/
+    uint8_t     data[UART_DATA_MAX];          /*数据内容*/
     uint8_t     timeout;                      /*超时时间*/
 }uart_data_s;
 

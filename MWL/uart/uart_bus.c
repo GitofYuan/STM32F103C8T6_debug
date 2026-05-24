@@ -22,22 +22,22 @@ typedef struct uart_data_queue_s
 {
     uart_data_s               uart_data;  /*UART数据*/
     struct uart_data_queue_s* p_next;     /*链表指针*/
-}can_data_queue;
+}uart_data_queue;
 
 /* UART数据队列指针结构体*/
 typedef struct
 {
-    can_data_queue* head;     /*链表头*/
-    can_data_queue* tail;     /*链表尾*/
-}can_data_pointer_s;
+    uart_data_queue* head;     /*链表头*/
+    uart_data_queue* tail;     /*链表尾*/
+}uart_data_pointer_s;
 /* ==============================  EXTERNS   =============================== */
-can_data_queue        s_uart_rx_data_queue[UART_DATA_CHNL_NUM_MAX][UART_DATA_QUEUE_NUM];   /*UART接收数据队列*/
-can_data_pointer_s    s_uart_rx_data_pointer[UART_DATA_CHNL_NUM_MAX];                      /*UART接收数据队列指针*/
+uart_data_queue        s_uart_rx_data_queue[UART_DATA_CHNL_NUM_MAX][UART_DATA_QUEUE_NUM];   /*UART接收数据队列*/
+uart_data_pointer_s    s_uart_rx_data_pointer[UART_DATA_CHNL_NUM_MAX];                      /*UART接收数据队列指针*/
 
-can_data_queue        s_uart_tx_data_queue[UART_DATA_CHNL_NUM_MAX][UART_DATA_QUEUE_NUM];   /*UART发送数据队列*/
-can_data_pointer_s    s_uart_tx_data_pointer[UART_DATA_CHNL_NUM_MAX];                      /*UART发送数据队列指针*/
+uart_data_queue        s_uart_tx_data_queue[UART_DATA_CHNL_NUM_MAX][UART_DATA_QUEUE_NUM];   /*UART发送数据队列*/
+uart_data_pointer_s    s_uart_tx_data_pointer[UART_DATA_CHNL_NUM_MAX];                      /*UART发送数据队列指针*/
 
-static uint8_t send_interval_timmer[UART_DATA_CHNL_NUM_MAX] = {0};   /*UART通道报文发送间隔计时器，ms*/
+static uint8_t uart_send_interval_timmer[UART_DATA_CHNL_NUM_MAX] = {0};   /*UART通道报文发送间隔计时器，ms*/
 
 uint8_t uart_addr[UART_DATA_CHNL_NUM_MAX] = {0};   /*各UART通道的设备地址*/
 
@@ -271,8 +271,7 @@ bool uart_tx_enqueue(uart_chnl_e chnl, uart_data_s* data)
         
         s_uart_tx_data_queue[chnl][0].uart_data.timeout = data->timeout;
         s_uart_tx_data_queue[chnl][0].uart_data.len = data->len;
-        s_uart_tx_data_queue[chnl][0].uart_data.data = data->data;
-//        memcpy(s_uart_tx_data_queue[chnl][0].uart_data.data, data->data, UART_DATA_MAX);
+        memcpy(s_uart_tx_data_queue[chnl][0].uart_data.data, data->data, data->len);
         ret = true;
     }
     else if((s_uart_tx_data_pointer[chnl].tail != NULL)
@@ -286,10 +285,9 @@ bool uart_tx_enqueue(uart_chnl_e chnl, uart_data_s* data)
         else
         {
             s_uart_tx_data_pointer[chnl].tail = s_uart_tx_data_pointer[chnl].tail->p_next;
-            s_uart_tx_data_queue[chnl][0].uart_data.timeout = data->timeout;
-            s_uart_tx_data_queue[chnl][0].uart_data.len = data->len;
-            s_uart_tx_data_queue[chnl][0].uart_data.data = data->data;
-//            memcpy(s_uart_tx_data_queue[chnl][0].uart_data.data, data->data, UART_DATA_MAX);
+            s_uart_tx_data_pointer[chnl].tail->uart_data.timeout = data->timeout;
+            s_uart_tx_data_pointer[chnl].tail->uart_data.len = data->len;
+            memcpy(s_uart_tx_data_pointer[chnl].tail->uart_data.data, data->data, data->len);
             ret = true;
         }
     }
@@ -319,8 +317,16 @@ bool uart_send(uart_chnl_e chnl, uart_data_s* data)
     /*设置消息头*/
     content.uart.len = data->len;                      /*设置标准ID*/
     content.uart.buf = data->data;                     /*设置扩展ID*/
-    content.uart.timeout_ms = data->timeout;              /*设置超时时间*/
-
+    
+    /*设置超时时间，如果timeout大于发送间隔，则使用发送间隔，否则使用正常输入的timeout*/
+    if(data->timeout >= UART_SEND_INTERVAL)
+    {
+        content.uart.timeout_ms = UART_SEND_INTERVAL;
+    }
+    else
+    {
+        content.uart.timeout_ms = data->timeout;              
+    }
     
     switch(chnl)
     {
@@ -371,17 +377,18 @@ bool uart_send(uart_chnl_e chnl, uart_data_s* data)
 *Input      :
 *Output     :
 *Returns    :
-*Note       :
+*Note       :经验教训，使用DMA库函数发送，调用后不能立刻清空发送buffer，要预留大概每字节1ms的时间，所以
+最好的办法是发送不适用DMA，而使用标准库函数，使用timeout参数强行拉长发送时间。
 *****************************************************************************************************/
 void uart_tx_dequeue(void)
 {
     uart_chnl_e chnl;
     for(chnl = UART_DATA_QUEUE_CHNL_1; chnl < UART_DATA_CHNL_NUM_MAX; chnl++)
     {
-        send_interval_timmer[chnl]++;
+        uart_send_interval_timmer[chnl]++;
         if ((s_uart_tx_data_pointer[chnl].tail == NULL)
             ||(s_uart_tx_data_pointer[chnl].head == NULL)
-            ||(send_interval_timmer[chnl] < UART_SEND_INTERVAL))   /*空队列或未到最小发送时间间隔*/
+            ||(uart_send_interval_timmer[chnl] < UART_SEND_INTERVAL))   /*空队列或未到最小发送时间间隔*/
         {
             continue;
         }
@@ -396,7 +403,7 @@ void uart_tx_dequeue(void)
                     memset(&s_uart_tx_data_pointer[chnl].head->uart_data, 0 ,sizeof(uart_data_s));
                     s_uart_tx_data_pointer[chnl].head = NULL;
                     s_uart_tx_data_pointer[chnl].tail = NULL;
-                    send_interval_timmer[chnl] = 0;
+                    uart_send_interval_timmer[chnl] = 0;
                 }
             }
             else
@@ -405,7 +412,7 @@ void uart_tx_dequeue(void)
                 {
                     memset(&s_uart_tx_data_pointer[chnl].head->uart_data, 0 ,sizeof(uart_data_s));
                     s_uart_tx_data_pointer[chnl].head =  s_uart_tx_data_pointer[chnl].head->p_next;
-                    send_interval_timmer[chnl] = 0;
+                    uart_send_interval_timmer[chnl] = 0;
                 }
             }
         }
@@ -419,7 +426,7 @@ void uart_tx_dequeue(void)
 *Input      :
 *Output     :
 *Returns    :
-*Note       :打印字符串长度受宏定义UART_DATA_MAX限制。
+*Note       :1、打印字符串长度受宏定义UART_DATA_MAX限制；2、由于使用UTF-8编译，所以不能打印中文。
 *****************************************************************************************************/
 int fputc(int ch,FILE *f)
 {
@@ -432,7 +439,7 @@ int fputc(int ch,FILE *f)
     {
         uart_data_s print_data;
         print_data.len = print_len;
-        print_data.data = print_buf;
+        memcpy(print_data.data, print_buf, print_len);
         print_data.timeout = UART_SEND_INTERVAL;
         uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &print_data);
         

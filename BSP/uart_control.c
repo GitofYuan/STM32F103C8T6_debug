@@ -210,7 +210,10 @@ bool uart_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, de
                         break;
                     case UART_MODE_DMA_TX:
                     case UART_MODE_DMA_RX_TX:
-                        if (HAL_UART_Transmit_DMA(huart, content->uart.buf, content->uart.len) != HAL_OK)
+                        /* 当前UART发送队列实现为同步出队后立即释放缓冲区，
+                           所以这里不使用DMA异步发送，改为同步阻塞发送以避免
+                           DMA传输过程中发送缓冲区被覆盖。 */
+                        if (HAL_UART_Transmit(huart, content->uart.buf, content->uart.len, content->uart.timeout_ms) != HAL_OK)
                         {
                             return false;
                         }

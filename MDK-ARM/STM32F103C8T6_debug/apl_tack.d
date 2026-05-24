@@ -1,4 +1,6 @@
 stm32f103c8t6_debug\apl_tack.o: ..\APL\apl_tack.c
+stm32f103c8t6_debug\apl_tack.o: E:\Keil\ARM\ARMCC\Bin\..\include\string.h
+stm32f103c8t6_debug\apl_tack.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 stm32f103c8t6_debug\apl_tack.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
 stm32f103c8t6_debug\apl_tack.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
 stm32f103c8t6_debug\apl_tack.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdint.h
@@ -13,7 +15,6 @@ stm32f103c8t6_debug\apl_tack.o: ../Middlewares/Third_Party/FreeRTOS/Source/inclu
 stm32f103c8t6_debug\apl_tack.o: ..\APL\can_protocol_handle.h
 stm32f103c8t6_debug\apl_tack.o: ..\MWL\share_data\share_data.h
 stm32f103c8t6_debug\apl_tack.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdbool.h
-stm32f103c8t6_debug\apl_tack.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 stm32f103c8t6_debug\apl_tack.o: ..\MWL\share_data\share_data_can.h
 stm32f103c8t6_debug\apl_tack.o: ..\MWL\share_data\share_data.h
 stm32f103c8t6_debug\apl_tack.o: ..\MWL\can\J1939\J1939.h
