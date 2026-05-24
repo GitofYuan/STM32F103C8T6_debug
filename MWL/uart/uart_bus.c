@@ -41,6 +41,9 @@ static uint8_t send_interval_timmer[UART_DATA_CHNL_NUM_MAX] = {0};   /*UART通�
 
 uint8_t uart_addr[UART_DATA_CHNL_NUM_MAX] = {0};   /*各UART通道的设备地址*/
 
+static uint8_t print_buf[UART_DATA_MAX] = {0};
+static uint8_t print_len = 0;
+
 //int fputc(int ch,FILE *f);
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
@@ -268,7 +271,8 @@ bool uart_tx_enqueue(uart_chnl_e chnl, uart_data_s* data)
         
         s_uart_tx_data_queue[chnl][0].uart_data.timeout = data->timeout;
         s_uart_tx_data_queue[chnl][0].uart_data.len = data->len;
-        memcpy(s_uart_tx_data_queue[chnl][0].uart_data.data, data->data, UART_DATA_MAX);
+        s_uart_tx_data_queue[chnl][0].uart_data.data = data->data;
+//        memcpy(s_uart_tx_data_queue[chnl][0].uart_data.data, data->data, UART_DATA_MAX);
         ret = true;
     }
     else if((s_uart_tx_data_pointer[chnl].tail != NULL)
@@ -284,7 +288,8 @@ bool uart_tx_enqueue(uart_chnl_e chnl, uart_data_s* data)
             s_uart_tx_data_pointer[chnl].tail = s_uart_tx_data_pointer[chnl].tail->p_next;
             s_uart_tx_data_queue[chnl][0].uart_data.timeout = data->timeout;
             s_uart_tx_data_queue[chnl][0].uart_data.len = data->len;
-            memcpy(s_uart_tx_data_queue[chnl][0].uart_data.data, data->data, UART_DATA_MAX);
+            s_uart_tx_data_queue[chnl][0].uart_data.data = data->data;
+//            memcpy(s_uart_tx_data_queue[chnl][0].uart_data.data, data->data, UART_DATA_MAX);
             ret = true;
         }
     }
@@ -408,23 +413,34 @@ void uart_tx_dequeue(void)
 }
 
 /*****************************************************************************************************
-*Function   :fputc
-*Description:prtinf函数
+*Function   :fputc（prtinf函数重定向）
+*Description:将数据先同一存入print_buf数组内，待数据填充完成或数组填满，再统一进行串口发送入队，这样确保
+             打印数据不会出现瞬时阻塞的情况。
 *Input      :
 *Output     :
 *Returns    :
-*Note       :
+*Note       :打印字符串长度受宏定义UART_DATA_MAX限制。
 *****************************************************************************************************/
-//int fputc(int ch,FILE *f)
-//{
-//    //device_ctrl_content_u huart1_cotent = {.uart={(uint8_t *)&ch, 0, 0, 0, 0, 0, 0, 0, 0}};
-//    uart_data_s print_data;
-//    print_data.len = 50;
-//    print_data.data = (uint8_t *)&ch;
-//    print_data.timeout = 0;
-//	uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &print_data);
-//	return ch;
-//}
+int fputc(int ch,FILE *f)
+{
+    if(print_len < UART_DATA_MAX)
+    {
+        print_buf[print_len] = ch;
+        print_len++;
+    }
+    if(ch == '\n' || print_len >= UART_DATA_MAX)
+    {
+        uart_data_s print_data;
+        print_data.len = print_len;
+        print_data.data = print_buf;
+        print_data.timeout = UART_SEND_INTERVAL;
+        uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &print_data);
+        
+        print_len = 0;
+    }
+	return ch;
+}
+
 
 
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

@@ -36,7 +36,7 @@ typedef enum
 typedef struct
 {
     uint8_t     len;                          /*数据长度*/
-    uint8_t     *data;                        /*数据内容*/
+    uint8_t     *data;                        /*数据内容指针*/
     uint8_t     timeout;                      /*超时时间*/
 }uart_data_s;
 

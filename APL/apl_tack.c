@@ -9,6 +9,7 @@
 #include "cmsis_os.h"
 
 #include "can_protocol_handle.h"
+#include "uart_bus.h"
 /* ==============================  DEFINES   =============================== */
 
 /* ==============================   ENUMS    =============================== */
@@ -16,7 +17,8 @@
 /* ======================== STRUCTURES AND UNIONS ========================== */
 
 /* ==============================  EXTERNS   =============================== */
-
+static uint16_t R485_tx_flag = 0;    
+static uint8_t  R485_tx_buf[UART_DATA_MAX] = {0};           /*R485发送缓冲区，大小根据实际需求定义*/
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
 *Function   :APL_Task(应用层任务)
@@ -34,6 +36,17 @@ void APL_Task(void *argument)
     {
         osDelay(1);
         can_protocol_handle_task();
+        if(R485_tx_flag >= 500)
+        {
+//            uart_data_s data;
+//            data.len = sprintf((char*)R485_tx_buf, "R485 test message %d", R485_tx_flag);
+//            data.data = R485_tx_buf;
+//            uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &data);
+            printf("enter if, flag=%u\n", R485_tx_flag);
+            printf("flag=%u\n", R485_tx_flag);
+            R485_tx_flag = 0;
+        }
+        R485_tx_flag ++;
     }
     /* USER CODE END APL_Task */
 }

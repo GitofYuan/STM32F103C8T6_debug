@@ -48,3 +48,11 @@ stm32f103c8t6_debug\apl_tack.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ha
 stm32f103c8t6_debug\apl_tack.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 stm32f103c8t6_debug\apl_tack.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 stm32f103c8t6_debug\apl_tack.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
+stm32f103c8t6_debug\apl_tack.o: ..\MWL\uart\uart_bus.h
+stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control.h
+stm32f103c8t6_debug\apl_tack.o: ../Core/Inc/gpio.h
+stm32f103c8t6_debug\apl_tack.o: ../Core/Inc/usart.h
+stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control_gpio.h
+stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control_uart.h
+stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control_can.h
+stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control_adc.h
