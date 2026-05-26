@@ -125,21 +125,31 @@ bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, dev
             TxHeader.RTR   = CAN_RTR_DATA;                 /*数据帧*/
             TxHeader.IDE   = CAN_ID_EXT;                   /*选择以扩展ID发送*/
             TxHeader.DLC   = content->can.dlc;             /*数据长度*/
-            /* 若没有空闲发送邮箱，短等待再尝试（防止未启动或邮箱占用导致失败） */
-            uint32_t free_mailboxes = HAL_CAN_GetTxMailboxesFreeLevel(can);
-
-            if(free_mailboxes > 0 && HAL_CAN_AddTxMessage(can, &TxHeader, content->can.data, &TxMailbox) == HAL_OK)
+            
+            if(HAL_CAN_AddTxMessage(can, &TxHeader, content->can.data, &TxMailbox) == HAL_OK)
             {
                 break;
             }
             else
             {
+                uint32_t free_mailboxes = HAL_CAN_GetTxMailboxesFreeLevel(can);
+                HAL_CAN_StateTypeDef can_state = HAL_CAN_GetState(can);
+
                 /* 发送失败：打印诊断信息，不再在写路径中重发 */
                 #ifdef DEBUG_CAN_BUS
                 printf("CAN send failure: free_mailboxes=%lu, state=%lu\n",
-                       (unsigned long)free_mailboxes,
-                       (unsigned long)HAL_CAN_GetState(can));
+                       (unsigned long)free_mailboxes,                        /*空闲邮箱数*/
+                       (unsigned long)can_state);                            /*CAN状态*/
                 #endif
+
+                /*如果CAN处于错误状态或总线复位状态，尝试重新初始化CAN*/
+                if(can_state == HAL_CAN_STATE_ERROR || can_state == HAL_CAN_STATE_RESET)
+                {
+                    
+                    device_ctrl_content_u baud_rate;
+                    baud_rate.can.baudrate = dev->hw_res.can.baud_rate;
+                    can_stm32_init(dev, &baud_rate);
+                }
                 return false;
             }
         }
