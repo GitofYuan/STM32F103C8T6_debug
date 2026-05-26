@@ -133,19 +133,23 @@ bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, dev
             else
             {
                 uint32_t free_mailboxes = HAL_CAN_GetTxMailboxesFreeLevel(can);
+                uint32_t can_flag = __HAL_CAN_GET_FLAG(can, CAN_FLAG_BOF);
                 HAL_CAN_StateTypeDef can_state = HAL_CAN_GetState(can);
 
                 /* 发送失败：打印诊断信息，不再在写路径中重发 */
                 #ifdef DEBUG_CAN_BUS
-                printf("CAN send failure: free_mailboxes=%lu, state=%lu\n",
+                printf("CAN send err: free=%lu, flag= %lu, state=%lu\n",
                        (unsigned long)free_mailboxes,                        /*空闲邮箱数*/
+                       (unsigned long)can_flag,                              /*CAN总线状态*/
                        (unsigned long)can_state);                            /*CAN状态*/
                 #endif
 
                 /*如果CAN处于错误状态或总线复位状态，尝试重新初始化CAN*/
-                if(can_state == HAL_CAN_STATE_ERROR || can_state == HAL_CAN_STATE_RESET)
+                if(can_flag != 0
+                    || can_state == HAL_CAN_STATE_ERROR 
+                    || can_state == HAL_CAN_STATE_RESET)
                 {
-                    
+                    HAL_CAN_Stop(can);
                     device_ctrl_content_u baud_rate;
                     baud_rate.can.baudrate = dev->hw_res.can.baud_rate;
                     can_stm32_init(dev, &baud_rate);
@@ -154,7 +158,7 @@ bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, dev
             }
         }
         case DEV_CTRL_CONFIG:
-            HAL_CAN_DeInit(can);
+            HAL_CAN_Stop(can);
             can_stm32_init(dev, content);
             break;
         case DEV_CTRL_GET_STATUS:
