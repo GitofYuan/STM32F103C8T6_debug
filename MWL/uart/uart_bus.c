@@ -441,7 +441,7 @@ int fputc(int ch,FILE *f)
         print_data.len = print_len;
         memcpy(print_data.data, print_buf, print_len);
         print_data.timeout = UART_SEND_INTERVAL;
-        uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &print_data);
+        uart_tx_enqueue(UART_DATA_QUEUE_CHNL_2, &print_data);
         
         print_len = 0;
     }

@@ -248,20 +248,21 @@ bool uart_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, de
 *Note       :原本使用__weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)是不对的，
              因为这个回调函数是DMA接收完成的回调，而我们需要的是空闲中断的处理，
              所以直接重定义USART1_IRQHandler来处理空闲中断更合适。
+            注：每次使用cube MX重建工程时，都会将stm32f1xx_it.c中原函数的__weak抹除，编译报错时注意完善。
 *****************************************************************************************************/
 void USART1_IRQHandler(void)
 {
     if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE) != RESET)
     {
-        __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_IDLE); /* 清除空闲中断标志 */
+        __HAL_UART_CLEAR_IDLEFLAG(&huart1); /* 正确清除IDLE中断标志 */
         HAL_UART_DMAStop(&huart1); /* 停止DMA接收 */
-        uint8_t huart1_rx_len = UART_DATA_MAX - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); /* 计算接收到的数据长度 */
+        uint16_t huart1_rx_len = UART_DATA_MAX - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); /* 计算接收到的数据长度 */
         
         if(huart1_rx_len > 0 && huart1_rx_len <= UART_DATA_MAX)
         {
             uart_data_s huart1_rx_data;
-            huart1_rx_data.len = huart1_rx_len;  /*用于计算有效数据长度*/
-            while(uart1_rx_buf[huart1_rx_data.len-1] == 0)
+            huart1_rx_data.len = (uint8_t)huart1_rx_len;  /*用于计算有效数据长度*/
+            while (huart1_rx_data.len > 0 && uart1_rx_buf[huart1_rx_data.len - 1] == 0)
             {
                 huart1_rx_data.len--;
             }

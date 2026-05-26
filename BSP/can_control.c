@@ -76,6 +76,10 @@ static bool can_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *conten
         return false;
     }
 
+    /* 启动 CAN 模块并激活接收中断 */
+    HAL_CAN_Start(can);
+    HAL_CAN_ActivateNotification(can, CAN_IT_RX_FIFO0_MSG_PENDING);
+
     // 初始化设备状态
     dev->is_opened = true; // UART初始化后需手动打开
     return true;
@@ -121,20 +125,21 @@ bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, dev
             TxHeader.RTR   = CAN_RTR_DATA;                 /*数据帧*/
             TxHeader.IDE   = CAN_ID_EXT;                   /*选择以扩展ID发送*/
             TxHeader.DLC   = content->can.dlc;             /*数据长度*/
-            if(HAL_CAN_AddTxMessage(can, &TxHeader, content->can.data, &TxMailbox) == HAL_OK)
+            /* 若没有空闲发送邮箱，短等待再尝试（防止未启动或邮箱占用导致失败） */
+            uint32_t free_mailboxes = HAL_CAN_GetTxMailboxesFreeLevel(can);
+
+            if(free_mailboxes > 0 && HAL_CAN_AddTxMessage(can, &TxHeader, content->can.data, &TxMailbox) == HAL_OK)
             {
                 break;
             }
             else
             {
-                /*发送错误处理*/
+                /* 发送失败：打印诊断信息，不再在写路径中重发 */
                 #ifdef DEBUG_CAN_BUS
-                printf("CAN send failure,init again!\n");
+                printf("CAN send failure: free_mailboxes=%lu, state=%lu\n",
+                       (unsigned long)free_mailboxes,
+                       (unsigned long)HAL_CAN_GetState(can));
                 #endif
-                device_ctrl_content_u baud_rate;
-                baud_rate.can.baudrate = dev->hw_res.can.baud_rate;
-                can_stm32_init(dev, &baud_rate);
-                HAL_CAN_Start(can);
                 return false;
             }
         }

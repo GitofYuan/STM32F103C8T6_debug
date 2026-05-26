@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "device_control.h"
+#include "share_data.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,6 +70,13 @@ const osThreadAttr_t APL_Task1_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for CAN_Task1 */
+osThreadId_t CAN_Task1Handle;
+const osThreadAttr_t CAN_Task1_attributes = {
+  .name = "CAN_Task1",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -78,6 +86,7 @@ const osThreadAttr_t APL_Task1_attributes = {
 void StartDefaultTask(void *argument);
 void BSP_Task(void *argument);
 void APL_Task(void *argument);
+void CAN_Task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -117,13 +126,20 @@ void MX_FREERTOS_Init(void) {
   /* creation of APL_Task1 */
   APL_Task1Handle = osThreadNew(APL_Task, NULL, &APL_Task1_attributes);
 
+  /* creation of CAN_Task1 */
+  CAN_Task1Handle = osThreadNew(CAN_Task, NULL, &CAN_Task1_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
-  device_control(DEV_TYPE_UART, "usart1", DEV_CTRL_OPEN, &huart1_cotent);
+  
+//  device_control(DEV_TYPE_UART, "usart1", DEV_CTRL_OPEN, &huart1_cotent);
+    share_data_init(CCU_V1);
+
+
   /* USER CODE END RTOS_EVENTS */
 
 }
@@ -180,6 +196,24 @@ __weak void APL_Task(void *argument)
     osDelay(1);
   }
   /* USER CODE END APL_Task */
+}
+
+/* USER CODE BEGIN Header_CAN_Task */
+/**
+* @brief Function implementing the CAN_Task1 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_CAN_Task */
+__weak void CAN_Task(void *argument)
+{
+  /* USER CODE BEGIN CAN_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END CAN_Task */
 }
 
 /* Private application code --------------------------------------------------*/

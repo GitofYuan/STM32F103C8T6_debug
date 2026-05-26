@@ -54,7 +54,7 @@ const char *gpio_dev_list[GPIO_DEV_NUM] =
 device_ctrl_content_u uart_init_config[UART_DEV_NUM] = 
 {                     /*收发缓冲区   数据长度   超时时间    传输模式               收发模式       波特率        数据位          停止位         校验位*/  
 /*usart1*/      {.uart={0,           0,          0,          UART_MODE_DMA_RX_TX,  UART_TX_RX,   BAUD_9600,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
-/*usart2*/      {.uart={0,           0,          0,          UART_MODE_POLLING,    UART_TX_RX,   BAUD_9600,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
+/*usart2*/      {.uart={0,           0,          0,          UART_MODE_POLLING,    UART_TX_RX,   BAUD_19200,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
 };
 const char *uart_dev_list[UART_DEV_NUM] = 
 {
@@ -184,7 +184,7 @@ void BSP_Task(void *argument)
         }
 
         /*其他中间层任务处理*/
-        J1939_handle_task();
+        
         uart_tx_dequeue();
     }
     /* USER CODE END BSP_Task */

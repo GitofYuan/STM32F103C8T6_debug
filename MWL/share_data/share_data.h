@@ -19,7 +19,7 @@ extern "C" {
 
 /* ==============================  DEFINES   =============================== */
 #define disDEBUG_SHARE_DATA
-#define CHAR_GUN_NUM   2          /*需要记录数据的充电枪数量*/
+#define CHAR_GUN_NUM   1          /*需要记录数据的充电枪数量*/
 
 /*s为结构体类型名称，m为结构体字段名称,该宏定义获取结构体中某字段的相对偏移量*/
 #define  OFFSET_OF(s,m)   (uint32_t)&(((s *)0)->m)  

@@ -153,17 +153,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>data</ItemText>
+          <ItemText>send_flag</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>R485_tx_buf</ItemText>
+          <ItemText>c_share_data_attri_tab</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>s_uart_tx_data_queue</ItemText>
+          <ItemText>frame_send_timer_27930</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

@@ -50,3 +50,7 @@ stm32f103c8t6_debug\freertos.o: ..\BSP\device_control_gpio.h
 stm32f103c8t6_debug\freertos.o: ..\BSP\device_control_uart.h
 stm32f103c8t6_debug\freertos.o: ..\BSP\device_control_can.h
 stm32f103c8t6_debug\freertos.o: ..\BSP\device_control_adc.h
+stm32f103c8t6_debug\freertos.o: ..\MWL\share_data\share_data.h
+stm32f103c8t6_debug\freertos.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+stm32f103c8t6_debug\freertos.o: ..\MWL\share_data\share_data_can.h
+stm32f103c8t6_debug\freertos.o: ..\MWL\share_data\share_data.h

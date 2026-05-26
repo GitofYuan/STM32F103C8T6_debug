@@ -841,7 +841,7 @@ bool can_send_timer(uint8_t char_gun_num, uint8_t frame_id)
                 uint8_t send_flag = 0;
                 uint32_t prot_offset = OFFSET_OF(control_info_t, bms_can_control[char_gun_num][frame_id].send_flag);
                 share_data_write(CONTROL_INFO, prot_offset, &send_flag, sizeof(send_flag));
-                frame_send_timer_27930[char_gun_num][CHM].send_count = 0;
+                frame_send_timer_27930[char_gun_num][frame_id].send_count = 0;
             }
         }
     }
