@@ -79,6 +79,8 @@ void Error_Handler(void);
 #define ISO_A1_Ctrl_GPIO_Port GPIOB
 #define ISO_A0_Ctrl_Pin GPIO_PIN_15
 #define ISO_A0_Ctrl_GPIO_Port GPIOB
+#define LED_Pin GPIO_PIN_8
+#define LED_GPIO_Port GPIOA
 #define Relay_Ctrl1_Pin GPIO_PIN_3
 #define Relay_Ctrl1_GPIO_Port GPIOB
 #define Relay_Ctrl2_Pin GPIO_PIN_4
