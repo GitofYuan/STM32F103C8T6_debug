@@ -12,6 +12,7 @@
 
 #include "can_protocol_handle.h"
 #include "uart_bus.h"
+#include "atk_ble03.h"
 /* ==============================  DEFINES   =============================== */
 
 /* ==============================   ENUMS    =============================== */
@@ -27,7 +28,13 @@ uint8_t chm_send[8] = {0};
 
     device_ctrl_content_u can_send_data;      /*定义一个CAN发送数据结构体（驱动层定义结构体）*/
 
-   
+atk_ble03_init_data_t ble_init_data = 
+{
+    .ble_name = "BLE03",
+    .spp_name = "SPP03",
+    .ble_mac = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55},
+    .uuid = {0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0},
+};
 
 
 /* ========================= FUNCTION PROTOTYPES =========================== */
@@ -48,30 +55,30 @@ void APL_Task(void *argument)
         osDelay(1);
         
 
-        
-        if(R485_tx_flag >= 2000)
-        {
-            
-            uart_data_s data = {0};
-            data.len = snprintf((char*)R485_tx_buf, UART_DATA_MAX, "HELLO\r\n");
-            memcpy(data.data, R485_tx_buf, data.len);
-            data.timeout = data.len;
-            uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &data);
-            
-            printf("send bt: HELLO\n");
-            
-            R485_tx_flag = 0;
-            
-        }
-        R485_tx_flag ++;
+        atk_ble03_init(&ble_init_data);
+//        if(R485_tx_flag >= 2000)
+//        {
+//            
+//            uart_data_s data = {0};
+//            data.len = snprintf((char*)R485_tx_buf, UART_DATA_MAX, "HELLO\r\n");
+//            memcpy(data.data, R485_tx_buf, data.len);
+//            data.timeout = data.len;
+//            uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &data);
+//            
+//            printf("send bt: HELLO\n");
+//            
+//            R485_tx_flag = 0;
+//            
+//        }
+//        R485_tx_flag ++;
 
-        uart_data_s uart_rx_data = {0};
-        uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &uart_rx_data);
-        if(uart_rx_data.len > 0)
-        {
-            printf("recv bt: %.*s\n", uart_rx_data.len, uart_rx_data.data);
-            
-        }
+//        uart_data_s uart_rx_data = {0};
+//        uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &uart_rx_data);
+//        if(uart_rx_data.len > 0)
+//        {
+//            printf("recv bt: %.*s\n", uart_rx_data.len, uart_rx_data.data);
+//            
+//        }
     }
     /* USER CODE END APL_Task */
 }

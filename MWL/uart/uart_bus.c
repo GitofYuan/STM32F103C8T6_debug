@@ -189,6 +189,7 @@ bool uart_rx_dequeue(uart_chnl_e chnl, uart_data_s* data)
             data->timeout = s_uart_rx_data_pointer[chnl].head->uart_data.timeout;
             data->len = s_uart_rx_data_pointer[chnl].head->uart_data.len;
             memcpy(data->data, s_uart_rx_data_pointer[chnl].head->uart_data.data, UART_DATA_MAX);
+            memset(s_uart_rx_data_pointer[chnl].head->uart_data.data, 0, UART_DATA_MAX);
             s_uart_rx_data_pointer[chnl].head = NULL;
             s_uart_rx_data_pointer[chnl].tail = NULL;
         }
@@ -197,6 +198,7 @@ bool uart_rx_dequeue(uart_chnl_e chnl, uart_data_s* data)
             data->timeout = s_uart_rx_data_pointer[chnl].head->uart_data.timeout;
             data->len = s_uart_rx_data_pointer[chnl].head->uart_data.len;
             memcpy(data->data, s_uart_rx_data_pointer[chnl].head->uart_data.data, UART_DATA_MAX);
+            memset(s_uart_rx_data_pointer[chnl].head->uart_data.data, 0, UART_DATA_MAX);
             s_uart_rx_data_pointer[chnl].head =  s_uart_rx_data_pointer[chnl].head->p_next;
         }
         ret = true;

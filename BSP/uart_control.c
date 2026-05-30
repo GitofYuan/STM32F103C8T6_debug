@@ -24,7 +24,7 @@
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 
-static uint8_t uart1_rx_buf[UART_DATA_MAX] = {0};           /*UART1接收缓冲区，大小根据实际需求定义*/
+uint8_t uart1_rx_buf[UART_DATA_MAX] = {0};           /*UART1接收缓冲区，大小根据实际需求定义*/
 
 /* ========================= FUNCTION PROTOTYPES =========================== */
 
@@ -266,9 +266,10 @@ void USART1_IRQHandler(void)
             {
                 huart1_rx_data.len--;
             }
-            memcpy(huart1_rx_data.data, uart1_rx_buf, huart1_rx_data.len);
+            memcpy(huart1_rx_data.data, uart1_rx_buf, UART_DATA_MAX);
 
             uart_rx_enqueue(UART_DATA_QUEUE_CHNL_1, &huart1_rx_data);
+            memset(uart1_rx_buf, 0, UART_DATA_MAX);
         }
 
         HAL_UART_Receive_DMA(&huart1, uart1_rx_buf, UART_DATA_MAX); /* 重新启动DMA接收 */

@@ -1,10 +1,10 @@
 stm32f103c8t6_debug\device_init.o: ..\MWL\init\device_init.c
-stm32f103c8t6_debug\device_init.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdbool.h
-stm32f103c8t6_debug\device_init.o: E:\Keil\ARM\ARMCC\Bin\..\include\string.h
+stm32f103c8t6_debug\device_init.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+stm32f103c8t6_debug\device_init.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 stm32f103c8t6_debug\device_init.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
 stm32f103c8t6_debug\device_init.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
-stm32f103c8t6_debug\device_init.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdint.h
-stm32f103c8t6_debug\device_init.o: E:\Keil\ARM\ARMCC\Bin\..\include\stddef.h
+stm32f103c8t6_debug\device_init.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+stm32f103c8t6_debug\device_init.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 stm32f103c8t6_debug\device_init.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 stm32f103c8t6_debug\device_init.o: ../Core/Inc/FreeRTOSConfig.h
 stm32f103c8t6_debug\device_init.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h

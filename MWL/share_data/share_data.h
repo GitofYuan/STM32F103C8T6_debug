@@ -16,6 +16,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdio.h>
 #include "share_data_can.h"
+#include "share_data_uart.h"
 
 /* ==============================  DEFINES   =============================== */
 #define disDEBUG_SHARE_DATA
@@ -158,6 +159,7 @@ typedef struct
     uint8_t                  gun_dc1_tem[CHAR_GUN_NUM];                 /*枪DC+温度，℃，1精度，-50偏移量*/
     uint8_t                  gun_dc2_tem[CHAR_GUN_NUM];                 /*枪DC-温度，℃，1精度，-50偏移量*/
     bms_charging_info_t      bms_charging_info[CHAR_GUN_NUM];           /*车辆充电信息*/
+    ble_frame_t              ble_frame[CHAR_GUN_NUM];                   /*BLE串口数据*/
     uint16_t                 out_of_bounds;                             /*防越界标志位*/
 }mesure_info_t;
 
@@ -169,6 +171,7 @@ typedef struct
     uint8_t                  k1k2_conctol_status[CHAR_GUN_NUM];             /*主接触器控制状态，0断开，1闭合*/
     charger_charging_info_t  charger_charging_info[CHAR_GUN_NUM];           /*充电机充电信息*/
     can_frame_control_t      bms_can_control[CHAR_GUN_NUM][CAN27930MAX];    /*充电CAN报文收发标志位*/
+    uart_frame_control_t     ble_uart_control[CHAR_GUN_NUM][BLE_FRAME_MAX]; /*BLE串口报文收发标志位*/
     uint16_t                 out_of_bounds;                                 /*防越界标志位*/
 }control_info_t;
 
