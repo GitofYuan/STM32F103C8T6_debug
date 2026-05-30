@@ -24,6 +24,10 @@
 #define BLE03_AT_CSN            "AT+CSN\r\n"              // 查询SPP名称
 #define BLE03_AT_SSN            "AT+SSN%s\r\n"         // 设置SPP名称
 
+#define BLE03_AT_SBMAC            "AT+SBMAC%s\r\n"         // 设置BLE MAC地址
+#define BLE03_AT_CBMAC            "AT+CBMAC\r\n"         // 查询BLE MAC地址
+ 
+
 #define BLE03_AT_SBSW0          "AT+SBSW0\r\n"           // 关闭BLE
 #define BLE03_AT_SBSW1          "AT+SBSW1\r\n"           // 打开BLE
 #define BLE03_AT_CBSW           "AT+CBSW\r\n"            // 查询BLE状态
@@ -49,8 +53,8 @@
 typedef struct {
     uint8_t   ble_name[20];
     uint8_t   spp_name[20];
-    uint8_t   ble_mac[6];
-    uint8_t   uuid[16];
+    uint8_t   ble_mac[13];
+    uint8_t   uuid[17];
 } atk_ble03_init_data_t;
 /* ==============================  EXTERNS   =============================== */
 
