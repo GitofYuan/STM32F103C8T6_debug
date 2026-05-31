@@ -28,13 +28,7 @@ uint8_t chm_send[8] = {0};
 
     device_ctrl_content_u can_send_data;      /*定义一个CAN发送数据结构体（驱动层定义结构体）*/
 
-atk_ble03_init_data_t ble_init_data = 
-{
-    .ble_name = "BLE03",
-    .spp_name = "SPP03",
-    .ble_mac = {0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x00},
-    .uuid = "EEEE",
-};
+
 
 
 /* ========================= FUNCTION PROTOTYPES =========================== */
@@ -54,8 +48,7 @@ void APL_Task(void *argument)
     {
         osDelay(1);
         
-
-        atk_ble03_init(&ble_init_data);
+        atk_ble03_handle_task();
 //        if(R485_tx_flag >= 2000)
 //        {
 //            
@@ -72,13 +65,7 @@ void APL_Task(void *argument)
 //        }
 //        R485_tx_flag ++;
 
-//        uart_data_s uart_rx_data = {0};
-//        uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &uart_rx_data);
-//        if(uart_rx_data.len > 0)
-//        {
-//            printf("recv bt: %.*s\n", uart_rx_data.len, uart_rx_data.data);
-//            
-//        }
+        
     }
     /* USER CODE END APL_Task */
 }

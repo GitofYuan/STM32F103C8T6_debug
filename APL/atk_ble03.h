@@ -18,6 +18,9 @@
 #define BLE03_AT_RELOAD         "AT+RELOAD\r\n"          // 恢复出厂
 #define BLE03_AT_SLED0          "AT+SLED0\r\n"           // LED灭(未连接)
 #define BLE03_AT_SLED1          "AT+SLED1\r\n"           // LED闪烁(默认)
+#define BLE03_AT_SPR0           "AT+SPR0\r\n"           // 关闭上电回传信息
+#define BLE03_AT_SPR1           "AT+SPR1\r\n"           // 打开上电回传信息
+
 
 #define BLE03_AT_CBN            "AT+CBN\r\n"              // 查询BLE名称
 #define BLE03_AT_SBN            "AT+SBN%s\r\n"         // 设置BLE名称
@@ -69,6 +72,26 @@ typedef struct {
 *Note       :
 *****************************************************************************************************/
 void atk_ble03_init(atk_ble03_init_data_t *init_data);
+
+/*****************************************************************************************************
+*Function   :
+*Description:
+*Input      :
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
+bool ble_rx_dequeue(uint8_t len, uint8_t* data);
+
+/*****************************************************************************************************
+*Function   :
+*Description:
+*Input      :
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
+bool ble_tx_enqueue(uint8_t len, uint8_t* data);
 
 #endif
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/
