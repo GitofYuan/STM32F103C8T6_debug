@@ -343,9 +343,64 @@ uint8_t ble_pack(const ble_plain_t *data, const uint8_t *vin, ble_frame_data_t *
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-void ble_protocol_tx(void);
+void protocol_tx_handle_author_ack1(uint8_t gun_num)
 {
     
+}
+
+/*****************************************************************************************************
+*Function   :
+*Description:
+*Input      :
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
+void ble_protocol_tx(void);
+{
+    /*把完成的报文控制属性表从共享内存中读取出来*/
+    control_info_t control_info;
+    share_data_read(CONTROL_INFO, 0, &control_info, sizeof(control_info_t));
+
+    /*以下是27930报文发送遍历处理*/
+    uint8_t  frame;
+    uint8_t char_gun_num;
+    for(char_gun_num = 0; char_gun_num < CHAR_GUN_NUM; char_gun_num++)
+    {
+        for(frame = 0; frame < BLE_FRAME_MAX; frame++)
+        {
+            uint8_t send_flag = control_info.ble_uart_control[char_gun_num][frame].send_flag;
+            if(send_flag == 1)
+            {
+                switch(frame)
+                {
+                case BLE_AUTHOR:
+                    /* code */
+                    break;
+                case BLE_AUTHOR_ACK1:
+                    protocol_tx_handle_author_ack1(char_gun_num);
+                    break;
+                case BLE_AUTHOR_ACK2:
+                    protocol_tx_handle_author_ack2(char_gun_num);
+                    break;
+                case BLE_AUTO_CHARGE:
+                    /* code */
+                    break;
+                case BLE_AUTO_CHARGE_ACK:
+                    protocol_tx_handle_auto_charge_ack(char_gun_num);
+                    break;
+                
+                default:
+                    break;
+                } 
+            }
+            /*这里要特别注意下，如果发现报文发送标志位为置为0，则说明该报文已经发送完成，则将报文发送定时器清零*/
+            else
+            {
+                memset(&ble_frame_send_timer[char_gun_num][frame], 0, sizeof(ble_frame_send_timer_t));
+            }
+        }
+    }
 
 }
 
