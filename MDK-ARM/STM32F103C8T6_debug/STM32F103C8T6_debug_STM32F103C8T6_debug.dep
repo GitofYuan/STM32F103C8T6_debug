@@ -132,7 +132,7 @@ I (..\BSP\device_control_adc.h)(0x6A11C0FC)
 I (..\MWL\share_data\share_data.h)(0x6A1AFAD0)
 I (E:\Keil\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
 I (..\MWL\share_data\share_data_can.h)(0x6A11C0FC)
-I (..\MWL\share_data\share_data_uart.h)(0x6A1AFAD0)
+I (..\MWL\share_data\share_data_uart.h)(0x6A1D9C56)
 F (../Core/Src/can.c)(0x6A16FA99)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\BSP -I ..\MWL\can\can_bus -I ..\MWL\can\J1939 -I ..\MWL\init -I ..\MWL\share_data -I ..\MWL\uart -I ..\APL-I.\RTE\_STM32F103C8T6_debug-IE:\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IE:\Keil\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="528" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o stm32f103c8t6_debug\can.o --omf_browse stm32f103c8t6_debug\can.crf --depend stm32f103c8t6_debug\can.d)
 I (../Core/Inc/can.h)(0x6A16FA99)
 I (../Core/Inc/main.h)(0x6A16FA9B)
@@ -1421,7 +1421,7 @@ I (E:\Keil\ARM\ARMCC\include\stdbool.h)(0x5CEB79DE)
 I (E:\Keil\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
 I (E:\Keil\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
 I (..\MWL\share_data\share_data_can.h)(0x6A11C0FC)
-I (..\MWL\share_data\share_data_uart.h)(0x6A1AFAD0)
+I (..\MWL\share_data\share_data_uart.h)(0x6A1D9C56)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h)(0x6743147A)
 I (E:\Keil\ARM\ARMCC\include\stddef.h)(0x5CEB79E2)
 I (../Core/Inc/FreeRTOSConfig.h)(0x6A16FA99)
@@ -1442,7 +1442,7 @@ I (E:\Keil\ARM\ARMCC\include\stdbool.h)(0x5CEB79DE)
 I (E:\Keil\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
 I (E:\Keil\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
 I (..\MWL\share_data\share_data_can.h)(0x6A11C0FC)
-I (..\MWL\share_data\share_data_uart.h)(0x6A1AFAD0)
+I (..\MWL\share_data\share_data_uart.h)(0x6A1D9C56)
 I (..\MWL\can\J1939\J1939.h)(0x6A11C0FC)
 I (..\MWL\can\can_bus\can_bus.h)(0x6A146C10)
 I (../Core/Inc/can.h)(0x6A16FA99)
@@ -1475,7 +1475,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x67431480)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x67431480)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x67431480)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x67431480)
-F (..\APL\apl_tack.c)(0x6A1B0AFD)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\BSP -I ..\MWL\can\can_bus -I ..\MWL\can\J1939 -I ..\MWL\init -I ..\MWL\share_data -I ..\MWL\uart -I ..\APL-I.\RTE\_STM32F103C8T6_debug-IE:\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IE:\Keil\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="528" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o stm32f103c8t6_debug\apl_tack.o --omf_browse stm32f103c8t6_debug\apl_tack.crf --depend stm32f103c8t6_debug\apl_tack.d)
+F (..\APL\apl_tack.c)(0x6A1DA2DB)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\BSP -I ..\MWL\can\can_bus -I ..\MWL\can\J1939 -I ..\MWL\init -I ..\MWL\share_data -I ..\MWL\uart -I ..\APL-I.\RTE\_STM32F103C8T6_debug-IE:\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IE:\Keil\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="528" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o stm32f103c8t6_debug\apl_tack.o --omf_browse stm32f103c8t6_debug\apl_tack.crf --depend stm32f103c8t6_debug\apl_tack.d)
 I (E:\Keil\ARM\ARMCC\include\string.h)(0x5CEB79E2)
 I (E:\Keil\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
 I (../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h)(0x6743147A)
@@ -1493,7 +1493,7 @@ I (..\APL\can_protocol_handle.h)(0x6A11C0FC)
 I (..\MWL\share_data\share_data.h)(0x6A1AFAD0)
 I (E:\Keil\ARM\ARMCC\include\stdbool.h)(0x5CEB79DE)
 I (..\MWL\share_data\share_data_can.h)(0x6A11C0FC)
-I (..\MWL\share_data\share_data_uart.h)(0x6A1AFAD0)
+I (..\MWL\share_data\share_data_uart.h)(0x6A1D9C56)
 I (..\MWL\can\J1939\J1939.h)(0x6A11C0FC)
 I (..\MWL\can\can_bus\can_bus.h)(0x6A146C10)
 I (../Core/Inc/can.h)(0x6A16FA99)
@@ -1533,15 +1533,63 @@ I (..\BSP\device_control_gpio.h)(0x6A11C0FC)
 I (..\BSP\device_control_uart.h)(0x6A11C0FC)
 I (..\BSP\device_control_can.h)(0x6A11C0FC)
 I (..\BSP\device_control_adc.h)(0x6A11C0FC)
-I (..\APL\atk_ble03.h)(0x6A1B0AFD)
-F (..\APL\atk_ble03.c)(0x6A1B1A5D)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\BSP -I ..\MWL\can\can_bus -I ..\MWL\can\J1939 -I ..\MWL\init -I ..\MWL\share_data -I ..\MWL\uart -I ..\APL-I.\RTE\_STM32F103C8T6_debug-IE:\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IE:\Keil\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="528" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o stm32f103c8t6_debug\atk_ble03.o --omf_browse stm32f103c8t6_debug\atk_ble03.crf --depend stm32f103c8t6_debug\atk_ble03.d)
+I (..\APL\atk_ble03.h)(0x6A1BD211)
+F (..\APL\atk_ble03.c)(0x6A1D9FF2)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\BSP -I ..\MWL\can\can_bus -I ..\MWL\can\J1939 -I ..\MWL\init -I ..\MWL\share_data -I ..\MWL\uart -I ..\APL-I.\RTE\_STM32F103C8T6_debug-IE:\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IE:\Keil\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="528" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o stm32f103c8t6_debug\atk_ble03.o --omf_browse stm32f103c8t6_debug\atk_ble03.crf --depend stm32f103c8t6_debug\atk_ble03.d)
 I (E:\Keil\ARM\ARMCC\include\string.h)(0x5CEB79E2)
 I (E:\Keil\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
-I (..\APL\atk_ble03.h)(0x6A1B0AFD)
+I (..\APL\atk_ble03.h)(0x6A1BD211)
 I (..\MWL\uart\uart_bus.h)(0x6A170F97)
 I (E:\Keil\ARM\ARMCC\include\stdbool.h)(0x5CEB79DE)
 I (..\BSP\device_control.h)(0x6A16FB61)
 I (E:\Keil\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
+I (E:\Keil\ARM\ARMCC\include\stddef.h)(0x5CEB79E2)
+I (../Core/Inc/gpio.h)(0x6A16FA98)
+I (../Core/Inc/main.h)(0x6A16FA9B)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x67431480)
+I (../Core/Inc/stm32f1xx_hal_conf.h)(0x6A16FA9B)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h)(0x67431480)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h)(0x67431480)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h)(0x67431480)
+I (../Drivers/CMSIS/Include/core_cm3.h)(0x67431479)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x67431479)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x67431479)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x67431479)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_exti.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_iwdg.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x67431480)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x67431480)
+I (../Core/Inc/usart.h)(0x6A16FA9A)
+I (../Core/Inc/can.h)(0x6A16FA99)
+I (..\BSP\device_control_gpio.h)(0x6A11C0FC)
+I (..\BSP\device_control_uart.h)(0x6A11C0FC)
+I (..\BSP\device_control_can.h)(0x6A11C0FC)
+I (..\BSP\device_control_adc.h)(0x6A11C0FC)
+F (..\APL\voyah_ble.c)(0x6A1DA031)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\BSP -I ..\MWL\can\can_bus -I ..\MWL\can\J1939 -I ..\MWL\init -I ..\MWL\share_data -I ..\MWL\uart -I ..\APL-I.\RTE\_STM32F103C8T6_debug-IE:\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IE:\Keil\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="528" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o stm32f103c8t6_debug\voyah_ble.o --omf_browse stm32f103c8t6_debug\voyah_ble.crf --depend stm32f103c8t6_debug\voyah_ble.d)
+I (E:\Keil\ARM\ARMCC\include\string.h)(0x5CEB79E2)
+I (..\APL\voyah_ble.h)(0x6A1C3EC4)
+I (..\MWL\share_data\share_data.h)(0x6A1AFAD0)
+I (E:\Keil\ARM\ARMCC\include\stdbool.h)(0x5CEB79DE)
+I (E:\Keil\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
+I (E:\Keil\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
+I (..\MWL\share_data\share_data_can.h)(0x6A11C0FC)
+I (..\MWL\share_data\share_data_uart.h)(0x6A1D9C56)
+I (..\APL\atk_ble03.h)(0x6A1BD211)
+I (..\MWL\uart\uart_bus.h)(0x6A170F97)
+I (..\BSP\device_control.h)(0x6A16FB61)
 I (E:\Keil\ARM\ARMCC\include\stddef.h)(0x5CEB79E2)
 I (../Core/Inc/gpio.h)(0x6A16FA98)
 I (../Core/Inc/main.h)(0x6A16FA9B)

@@ -37,13 +37,7 @@ enum
     BLE_INIT_COMPLETE,
 }ble_init_state = BLE_INIT_IDLE;   /*BLE03初始化状态枚举*/    
 
-atk_ble03_init_data_t ble_init_data = 
-{
-    .ble_name = "BLE03",
-    .spp_name = "SPP03",
-    .ble_mac = {0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x00},
-    .uuid = "EEEE",
-};
+
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
 *Function   :
@@ -344,43 +338,43 @@ bool ble_tx_enqueue(uint8_t len, uint8_t* data)
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-void atk_ble03_handle_task(void)
-{
-    if(ble_init_flag == false)
-    {
-        /*如果BLE模块未初始化，则先进行初始化*/
-        atk_ble03_init(&ble_init_data);
-    }
-    else
-    {
-        uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data);
-        if(ble_rx_data.len > 0)
-        {
-            printf("recv bt: %.*s\n", ble_rx_data.len, ble_rx_data.data);
-            memset(&ble_rx_data, 0, sizeof(uart_data_s));
-        }
-        
-        if(ble_send_timer >= 200)
-        {
-            device_ctrl_content_u ble_state={0};
-            device_control(DEV_TYPE_GPIO, "address1", DEV_CTRL_READ, &ble_state);
-            if(ble_state.gpio.level == GPIO_SET)
-            {
-                uart_data_s data = {0};
-                data.len = snprintf((char*)ble_tx_buf, UART_DATA_MAX, "HELLO\r\n");
-                memcpy(data.data, ble_tx_buf, data.len);
-                data.timeout = data.len;
-                uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &data);
-                
-                printf("send bt: HELLO\n");
-            }
-            
-            
-            ble_send_timer = 0;
-            
-        }
-        ble_send_timer ++;
-    }
-    
-}
+//void atk_ble03_handle_task(void)
+//{
+//    if(ble_init_flag == false)
+//    {
+//        /*如果BLE模块未初始化，则先进行初始化*/
+//        atk_ble03_init(&ble_init_data);
+//    }
+//    else
+//    {
+//        uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data);
+//        if(ble_rx_data.len > 0)
+//        {
+//            printf("recv bt: %.*s\n", ble_rx_data.len, ble_rx_data.data);
+//            memset(&ble_rx_data, 0, sizeof(uart_data_s));
+//        }
+//        
+//        if(ble_send_timer >= 200)
+//        {
+//            device_ctrl_content_u ble_state = {0};
+//            device_control(DEV_TYPE_GPIO, "address1", DEV_CTRL_READ, &ble_state);
+//            if(ble_state.gpio.level == GPIO_SET)
+//            {
+//                uart_data_s data = {0};
+//                data.len = snprintf((char*)ble_tx_buf, UART_DATA_MAX, "HELLO\r\n");
+//                memcpy(data.data, ble_tx_buf, data.len);
+//                data.timeout = data.len;
+//                uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &data);
+//                
+//                printf("send bt: HELLO\n");
+//            }
+//            
+//            
+//            ble_send_timer = 0;
+//            
+//        }
+//        ble_send_timer ++;
+//    }
+//    
+//}
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

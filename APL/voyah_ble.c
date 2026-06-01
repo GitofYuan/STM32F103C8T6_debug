@@ -6,10 +6,12 @@
 * Description       :
 ******************************************************************************/
 /* ==============================  INCLUDES  =============================== */
+#include <string.h>
+
 #include "voyah_ble.h"
 /* ==============================  DEFINES   =============================== */
 // 32位循环左移
-#define ROTL32(x,n) (((x) << (n)) | ((x) >> (32-(n)))))
+#define ROTL32(x,n) (((x) << (n)) | ((x) >> (32-(n))))
 /* ==============================   ENUMS    =============================== */
 
 /* ======================== STRUCTURES AND UNIONS ========================== */
@@ -18,11 +20,11 @@
 /*对蓝牙报文属性进行定义*/
 const ble_frame_attribute_t ble_frame_attribute[BLE_FRAME_MAX] = 
 {               /*           cmd_num       长度      默认发送周期  默认发送次数  临时发送周期  临时发送次数    */
-    /*BLE_AUTHOR*/          { 0x01,        3,        250,        0xFFFF,      250,         0xFFFF     },
-    /*BLE_AUTHOR_ACK1*/     { 0x01,        2,        250,        0xFFFF,      250,         0xFFFF     },
-    /*BLE_AUTHOR_ACK2*/     { 0x02,        8,        250,        0xFFFF,      250,         0xFFFF     },
-    /*BLE_AUTO_CHARGE*/     { 0x03,        41,       250,        0xFFFF,      250,         0xFFFF     },
-    /*BLE_AUTO_CHARGE_ACK*/ { 0x03,        13,       500,        0xFFFF,      500,         0xFFFF     },
+    /*BLE_AUTHOR*/          { 0x01,        20,        250,        0xFFFF,      250,         0xFFFF     },
+    /*BLE_AUTHOR_ACK1*/     { 0x01,        4,         250,        0,           250,         0          },
+    /*BLE_AUTHOR_ACK2*/     { 0x02,        5,         250,        0,           250,         0          },
+    /*BLE_AUTO_CHARGE*/     { 0x03,        4,         250,        0xFFFF,      250,         0xFFFF     },
+    /*BLE_AUTO_CHARGE_ACK*/ { 0x03,        6,         500,        0,           500,         0          },
 };
 
 /*定义所有枪及其所有蓝牙报文的发送定时器*/
@@ -75,6 +77,14 @@ static const uint32_t rcon[10] = {
 };
 
 static uint8_t ble_rx_buf[UART_DATA_MAX];      /*BLE03发送缓冲区，大小根据实际需求定义*/
+
+atk_ble03_init_data_t ble_init_data = 
+{
+    .ble_name = "BLE03",
+    .spp_name = "SPP03",
+    .ble_mac = {0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x00},
+    .uuid = "EEEE",
+};
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
 *Function   :16字节密钥生成函数
@@ -269,7 +279,7 @@ static void aes_addroundkey(uint8_t *state, const uint32_t *w, int round)
              uint8_t *key  AES加密密钥，长度为16字节
 *Output     :uint8_t *out  加密后的16字节密文数据缓冲区指针
 *Returns    :
-*Note       :这些地方涉及AES128-ECB加密算法，几乎看不懂。
+*Note       :这些地方涉及AES128-ECB加密算法，几乎看不懂。就在这里崩了
 *****************************************************************************************************/
 void aes128_ecb_encrypt(const uint8_t *in, uint8_t *out, const uint8_t *key)
 {
@@ -345,7 +355,32 @@ uint8_t ble_pack(const ble_plain_t *data, const uint8_t *vin, ble_frame_data_t *
 *****************************************************************************************************/
 void protocol_tx_handle_author_ack1(uint8_t gun_num)
 {
-    
+    author_ret_e             author_ret;             /*鉴权结果*/
+    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].author_ret);
+    share_data_read(MESURE_INFO, mesure_offset, &author_ret, sizeof(author_ret_e));
+
+    uint8_t vin[17] = {0};                   /*车辆VIN码*/
+    uint32_t vin_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].bms_vin);
+    share_data_read(MESURE_INFO, vin_offset, vin, sizeof(vin));
+
+    ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
+    plain_data.plain_len = ble_frame_attribute[BLE_AUTHOR_ACK1].size;
+    plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
+    plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
+    plain_data.data[2] = ble_frame_attribute[BLE_AUTHOR_ACK1].cmd_num; /*报文命令字*/
+    plain_data.data[3] = (uint8_t)author_ret; /*鉴权结果*/
+    ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
+
+    // 发送
+    uart_data_s ble_tx_data = {0};
+    ble_tx_data.len = ble_pack(&plain_data, vin, &frame_data);
+    ble_tx_data.data[0] = frame_data.frame_head;
+    ble_tx_data.data[1] = frame_data.effective_len;
+    memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
+    ble_tx_data.data[2 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
+    ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
+    ble_tx_data.timeout = ble_tx_data.len;
+    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
 }
 
 /*****************************************************************************************************
@@ -356,7 +391,97 @@ void protocol_tx_handle_author_ack1(uint8_t gun_num)
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-void ble_protocol_tx(void);
+void protocol_tx_handle_author_ack2(uint8_t gun_num)
+{
+    struct
+    {
+        author_fail_reason_e     fail_reason;            /*鉴权失败原因*/
+        charger_device_type_e    device_type;            /*设备类型*/
+    }author_ack2;
+    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].fail_reason);
+    share_data_read(MESURE_INFO, mesure_offset, &author_ack2, sizeof(author_ack2));
+
+    uint8_t vin[17] = {0};                   /*车辆VIN码*/
+    uint32_t vin_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].bms_vin);
+    share_data_read(MESURE_INFO, vin_offset, vin, sizeof(vin));
+
+    ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
+    plain_data.plain_len = ble_frame_attribute[BLE_AUTHOR_ACK2].size;
+    plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
+    plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
+    plain_data.data[2] = ble_frame_attribute[BLE_AUTHOR_ACK2].cmd_num; /*报文命令字*/
+    plain_data.data[3] = (uint8_t)author_ack2.device_type; /*设备类型*/
+    plain_data.data[4] = (uint8_t)author_ack2.fail_reason; /*鉴权失败原因*/
+
+    ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
+
+    // 发送
+    uart_data_s ble_tx_data = {0};
+    ble_tx_data.len = ble_pack(&plain_data, vin, &frame_data);
+    ble_tx_data.data[0] = frame_data.frame_head;
+    ble_tx_data.data[1] = frame_data.effective_len;
+    memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
+    ble_tx_data.data[2 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
+    ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
+    ble_tx_data.timeout = ble_tx_data.len;
+    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
+}
+
+/*****************************************************************************************************
+*Function   :
+*Description:
+*Input      :
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
+void protocol_tx_handle_auto_charge_ack(uint8_t gun_num)
+{
+    struct
+    {
+        vehicle_position_e       vehicle_position;       /*车辆位置判断*/
+        charger_arm_status_e     charger_arm_status;     /*机械臂运行状态*/
+        arm_fail_reason_e        arm_fail_reason;        /*机械臂失败原因*/
+    }auto_charge_ack;
+    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].vehicle_position);
+    share_data_read(MESURE_INFO, mesure_offset, &auto_charge_ack, sizeof(auto_charge_ack));
+
+    uint8_t vin[17] = {0};                   /*车辆VIN码*/
+    uint32_t vin_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].bms_vin);
+    share_data_read(MESURE_INFO, vin_offset, vin, sizeof(vin));
+
+    ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
+    plain_data.plain_len = ble_frame_attribute[BLE_AUTO_CHARGE_ACK].size;
+    plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
+    plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
+    plain_data.data[2] = ble_frame_attribute[BLE_AUTO_CHARGE_ACK].cmd_num; /*报文命令字*/
+    plain_data.data[3] = (uint8_t)auto_charge_ack.vehicle_position; /*车辆位置判断*/
+    plain_data.data[4] = (uint8_t)auto_charge_ack.charger_arm_status; /*机械臂运行状态*/
+    plain_data.data[5] = (uint8_t)auto_charge_ack.arm_fail_reason; /*机械臂失败原因*/
+
+    ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
+
+    // 发送
+    uart_data_s ble_tx_data = {0};
+    ble_tx_data.len = ble_pack(&plain_data, vin, &frame_data);
+    ble_tx_data.data[0] = frame_data.frame_head;
+    ble_tx_data.data[1] = frame_data.effective_len;
+    memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
+    ble_tx_data.data[2 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
+    ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
+    ble_tx_data.timeout = ble_tx_data.len;
+    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
+}
+
+/*****************************************************************************************************
+*Function   :
+*Description:
+*Input      :
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
+void ble_protocol_tx(void)
 {
     /*把完成的报文控制属性表从共享内存中读取出来*/
     control_info_t control_info;
@@ -370,7 +495,7 @@ void ble_protocol_tx(void);
         for(frame = 0; frame < BLE_FRAME_MAX; frame++)
         {
             uint8_t send_flag = control_info.ble_uart_control[char_gun_num][frame].send_flag;
-            if(send_flag == 1)
+            if(send_flag == 0)
             {
                 switch(frame)
                 {
@@ -381,13 +506,13 @@ void ble_protocol_tx(void);
                     protocol_tx_handle_author_ack1(char_gun_num);
                     break;
                 case BLE_AUTHOR_ACK2:
-                    protocol_tx_handle_author_ack2(char_gun_num);
+//                    protocol_tx_handle_author_ack2(char_gun_num);
                     break;
                 case BLE_AUTO_CHARGE:
                     /* code */
                     break;
                 case BLE_AUTO_CHARGE_ACK:
-                    protocol_tx_handle_auto_charge_ack(char_gun_num);
+//                    protocol_tx_handle_auto_charge_ack(char_gun_num);
                     break;
                 
                 default:
@@ -533,18 +658,18 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
         return -2;
 
     // 3. 解密
-    bt_gen_key(vin, key);
+    ble_gen_key(vin, key);
     dec_len = (frame->effective_len + AES_BLOCK_SIZE - 1) / AES_BLOCK_SIZE * AES_BLOCK_SIZE;
     for (int i = 0; i < dec_len; i += AES_BLOCK_SIZE)
         aes128_ecb_decrypt(frame->encrypt_data + i, dec_buf + i, key);
 
     // 4. 去填充
-    dec_len = bt_pkcs7_unpad(dec_buf, dec_len);
-    if (dec_len != frame->len)
+    dec_len = ble_pkcs7_unpad(dec_buf, dec_len);
+    if (dec_len != frame->effective_len)
         return -3;
 
     // 5. 复制业务数据
-    memcpy(data, dec_buf, sizeof(bt_data_t));
+    memcpy(data, dec_buf, sizeof(ble_plain_t));
 
     return 0;
 }
@@ -557,7 +682,7 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-void ble_protocol_rx(void);
+void ble_protocol_rx(void)
 {
     uint8_t len = 0;             /*报文长度*/
     uint8_t effective_len = 0;   /*有效数据长度*/
@@ -590,6 +715,7 @@ void ble_protocol_rx(void);
 *****************************************************************************************************/
 void ble_protocol_handle_task(void)
 {
+    atk_ble03_init(&ble_init_data);
     ble_protocol_rx();
     ble_protocol_tx();
 }

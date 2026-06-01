@@ -672,6 +672,11 @@
               <FileType>1</FileType>
               <FilePath>..\APL\atk_ble03.c</FilePath>
             </File>
+            <File>
+              <FileName>voyah_ble.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APL\voyah_ble.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

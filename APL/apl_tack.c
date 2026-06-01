@@ -48,10 +48,10 @@ void APL_Task(void *argument)
     {
         osDelay(1);
         
-        atk_ble03_handle_task();
-//        if(R485_tx_flag >= 2000)
-//        {
-//            
+        
+        if(R485_tx_flag >= 2000)
+        {
+            ble_protocol_handle_task();
 //            uart_data_s data = {0};
 //            data.len = snprintf((char*)R485_tx_buf, UART_DATA_MAX, "HELLO\r\n");
 //            memcpy(data.data, R485_tx_buf, data.len);
@@ -60,10 +60,10 @@ void APL_Task(void *argument)
 //            
 //            printf("send bt: HELLO\n");
 //            
-//            R485_tx_flag = 0;
-//            
-//        }
-//        R485_tx_flag ++;
+            R485_tx_flag = 0;
+            
+        }
+        R485_tx_flag ++;
 
         
     }

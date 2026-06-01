@@ -50,6 +50,7 @@
 "stm32f103c8t6_debug\can_protocol_handle.o"
 "stm32f103c8t6_debug\apl_tack.o"
 "stm32f103c8t6_debug\atk_ble03.o"
+"stm32f103c8t6_debug\voyah_ble.o"
 --library_type=microlib --strict --scatter "STM32F103C8T6_debug\STM32F103C8T6_debug.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

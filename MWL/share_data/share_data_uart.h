@@ -38,7 +38,7 @@ enum
 /*蓝牙鉴权结果*/
 typedef enum
 {
-    INIT = 0,                 /*初始化*/
+    AUTHOR_RET_INIT = 0,                 /*初始化*/
     AUTHOR_SUCCESS,           /*鉴权成功*/
     AUTHOR_FAIL,              /*鉴权失败*/
     GUN_DISCONNECTED,         /*枪未连接*/
@@ -47,17 +47,17 @@ typedef enum
 /*设备类型*/
 typedef enum
 {
-    INIT = 0,                 /*初始化*/
+    DEVICE_TYPE_INIT = 0,                 /*初始化*/
     HOME_AUTO_CHARGER,        /*家充机器人*/
     HOME_CHARGER,             /*家充*/
     HOME_CHARGER_LOCK,        /*家充地锁*/
     PUBLIC_CHARGER_LOCK,      /*公充地锁*/
-}device_type_e;
+}charger_device_type_e;
 
 /*鉴权失败原因*/
 typedef enum
 {
-    INIT = 0,                 /*初始化*/
+    FAIL_REASON_INIT = 0,                 /*初始化*/
     NOT_IN_WHITE_LIST,        /*不在白名单*/
     DEVICE_UNAVAILABLE,       /*设备不可用*/
 }author_fail_reason_e;
@@ -65,7 +65,7 @@ typedef enum
 /*车辆充电请求*/
 typedef enum
 {
-    INIT = 0,                 /*初始化*/
+    CHARGE_REQUEST_INIT = 0,                 /*初始化*/
     REQUEST_CHARGE,           /*请求插枪*/
     REQUEST_UNCHARGE,         /*请求拔枪*/
     REQUEST_RESERVE,          /*请求撤销*/
@@ -82,7 +82,7 @@ typedef enum
 /*机械臂运行状态*/
 typedef enum
 {
-    INIT = 0,               /*初始化*/
+    ARM_STATUS_INIT = 0,               /*初始化*/
     LOCATING,               /*正在定位*/
     INSERTING,              /*插枪中*/
     INSERTED,               /*插枪完成*/
@@ -95,8 +95,8 @@ typedef enum
 /*失败原因*/
 typedef enum
 {
-    INIT = 0,                    /*初始化*/
-    OUT_OF_RANGE,                /*超范围*/
+    ARM_FAIL_INIT = 0,                    /*初始化*/
+    INSERT_OUT_OF_RANGE,                /*超范围*/
     GET_GUN_FAILED,              /*取枪失败*/
     CHARGING_PORT_NOT_OPEN,      /*充电口盖未开启*/
     CHARGING_PORT_BLOCK,         /*充电口有障碍物*/
@@ -117,10 +117,10 @@ typedef enum
 typedef struct
 {
     uint8_t                  bms_vin[17];            /*车辆识别码VIN*/
+    vehicle_charge_request_e vehicle_charge_request; /*车辆充电请求*/
     author_ret_e             author_ret;             /*鉴权结果*/
     author_fail_reason_e     fail_reason;            /*鉴权失败原因*/
-    device_type_e            device_type;            /*设备类型*/
-    vehicle_charge_request_e vehicle_charge_request; /*车辆充电请求*/
+    charger_device_type_e    device_type;            /*设备类型*/
     vehicle_position_e       vehicle_position;       /*车辆位置判断*/
     charger_arm_status_e     charger_arm_status;     /*机械臂运行状态*/
     arm_fail_reason_e        arm_fail_reason;        /*机械臂失败原因*/
