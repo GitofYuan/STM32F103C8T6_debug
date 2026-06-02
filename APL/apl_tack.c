@@ -12,7 +12,7 @@
 
 #include "can_protocol_handle.h"
 #include "uart_bus.h"
-#include "atk_ble03.h"
+#include "voyah_ble.h"
 /* ==============================  DEFINES   =============================== */
 
 /* ==============================   ENUMS    =============================== */
@@ -26,7 +26,7 @@ static uint8_t  R485_tx_buf[UART_DATA_MAX] = {0};           /*R485发送缓冲�
 uint8_t chm_send[8] = {0};
 //Can_Rcv_Data can_send_data;
 
-    device_ctrl_content_u can_send_data;      /*定义一个CAN发送数据结构体（驱动层定义结构体）*/
+
 
 
 
@@ -48,10 +48,10 @@ void APL_Task(void *argument)
     {
         osDelay(1);
         
-        
-        if(R485_tx_flag >= 2000)
+        ble_protocol_handle_task();
+        if(R485_tx_flag >= 200)
         {
-            ble_protocol_handle_task();
+            
 //            uart_data_s data = {0};
 //            data.len = snprintf((char*)R485_tx_buf, UART_DATA_MAX, "HELLO\r\n");
 //            memcpy(data.data, R485_tx_buf, data.len);

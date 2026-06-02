@@ -7,7 +7,7 @@
 ******************************************************************************/
 /* ==============================  INCLUDES  =============================== */
 #include <string.h>
-
+#include <stdbool.h>
 #include "voyah_ble.h"
 /* ==============================  DEFINES   =============================== */
 // 32位循环左移
@@ -78,6 +78,7 @@ static const uint32_t rcon[10] = {
 
 static uint8_t ble_rx_buf[UART_DATA_MAX];      /*BLE03发送缓冲区，大小根据实际需求定义*/
 
+bool ble_init_flag = false;   /*BLE03初始化标志位*/
 atk_ble03_init_data_t ble_init_data = 
 {
     .ble_name = "BLE03",
@@ -85,6 +86,9 @@ atk_ble03_init_data_t ble_init_data =
     .ble_mac = {0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x00},
     .uuid = "EEEE",
 };
+
+///* 车辆VIN码的唯一定义（避免在头文件中重复定义） */
+//uint8_t VIN[17] = "LSVAGGAE9N100001";   /*车辆VIN码，长度为17字节*/
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
 *Function   :16字节密钥生成函数
@@ -503,10 +507,10 @@ void ble_protocol_tx(void)
                     /* code */
                     break;
                 case BLE_AUTHOR_ACK1:
-                    protocol_tx_handle_author_ack1(char_gun_num);
+//                    protocol_tx_handle_author_ack1(char_gun_num);
                     break;
                 case BLE_AUTHOR_ACK2:
-//                    protocol_tx_handle_author_ack2(char_gun_num);
+                    protocol_tx_handle_author_ack2(char_gun_num);
                     break;
                 case BLE_AUTO_CHARGE:
                     /* code */
@@ -715,8 +719,15 @@ void ble_protocol_rx(void)
 *****************************************************************************************************/
 void ble_protocol_handle_task(void)
 {
-    atk_ble03_init(&ble_init_data);
-    ble_protocol_rx();
-    ble_protocol_tx();
+    if(ble_init_flag == false)
+    {
+        ble_init_flag = atk_ble03_init(&ble_init_data);
+    }
+    else
+    {
+        ble_protocol_rx();
+        ble_protocol_tx();
+    }
+
 }
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

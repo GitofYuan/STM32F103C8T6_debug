@@ -67,7 +67,7 @@ const osThreadAttr_t BSP_Task1_attributes = {
 osThreadId_t APL_Task1Handle;
 const osThreadAttr_t APL_Task1_attributes = {
   .name = "APL_Task1",
-  .stack_size = 128 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for CAN_Task1 */

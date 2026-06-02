@@ -58,4 +58,5 @@ stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control_gpio.h
 stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control_uart.h
 stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control_can.h
 stm32f103c8t6_debug\apl_tack.o: ..\BSP\device_control_adc.h
+stm32f103c8t6_debug\apl_tack.o: ..\APL\voyah_ble.h
 stm32f103c8t6_debug\apl_tack.o: ..\APL\atk_ble03.h

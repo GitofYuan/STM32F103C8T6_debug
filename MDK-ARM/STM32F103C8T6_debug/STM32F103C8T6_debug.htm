@@ -3,11 +3,11 @@
 <title>Static Call Graph - [STM32F103C8T6_debug\STM32F103C8T6_debug.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image STM32F103C8T6_debug\STM32F103C8T6_debug.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Mon Jun 01 23:18:54 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Tue Jun 02 23:23:48 2026
 <BR><P>
 <H3>Maximum Stack Usage =        776 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-APL_Task &rArr; ble_protocol_handle_task &rArr; ble_protocol_tx &rArr; protocol_tx_handle_author_ack1 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
+APL_Task &rArr; ble_protocol_handle_task &rArr; ble_protocol_tx &rArr; protocol_tx_handle_author_ack2 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
 <P>
 <H3>
 Mutually Recursive functions
@@ -284,7 +284,7 @@ Global Symbols
 <LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fputc
 <LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_rx_enqueue
 <LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART1_IRQHandler
-<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack1
+<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack2
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_pack
 <LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;aes128_ecb_encrypt
 <LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_rx_dequeue
@@ -340,7 +340,7 @@ Global Symbols
 <LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_tx_dequeue
 <LI><a href="#[148]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_tx_queue_init
 <LI><a href="#[144]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_rx_queue_init
-<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack1
+<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack2
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_pack
 <LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BLE03_SendCmd
 </UL>
@@ -387,8 +387,8 @@ Global Symbols
 
 <P><STRONG><a name="[16b]"></a>__decompress1</STRONG> (Thumb, 86 bytes, Stack size unknown bytes, __dczerorl2.o(.text), UNUSED)
 
-<P><STRONG><a name="[3b]"></a>APL_Task</STRONG> (Thumb, 34 bytes, Stack size 0 bytes, apl_tack.o(i.APL_Task))
-<BR><BR>[Stack]<UL><LI>Max Depth = 776<LI>Call Chain = APL_Task &rArr; ble_protocol_handle_task &rArr; ble_protocol_tx &rArr; protocol_tx_handle_author_ack1 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
+<P><STRONG><a name="[3b]"></a>APL_Task</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, apl_tack.o(i.APL_Task))
+<BR><BR>[Stack]<UL><LI>Max Depth = 776<LI>Call Chain = APL_Task &rArr; ble_protocol_handle_task &rArr; ble_protocol_tx &rArr; protocol_tx_handle_author_ack2 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_protocol_handle_task
@@ -1298,7 +1298,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[3a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_Task
 </UL>
 
-<P><STRONG><a name="[d8]"></a>atk_ble03_init</STRONG> (Thumb, 446 bytes, Stack size 16 bytes, atk_ble03.o(i.atk_ble03_init))
+<P><STRONG><a name="[d8]"></a>atk_ble03_init</STRONG> (Thumb, 436 bytes, Stack size 16 bytes, atk_ble03.o(i.atk_ble03_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = atk_ble03_init &rArr; BLE03_SendCmd &rArr; uart_tx_enqueue &rArr; uart_tx_queue_init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_rx_dequeue
@@ -1330,7 +1330,7 @@ Global Symbols
 <LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_crc16_ibm
 <LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;aes128_ecb_encrypt
 </UL>
-<BR>[Called By]<UL><LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack1
+<BR>[Called By]<UL><LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack2
 </UL>
 
 <P><STRONG><a name="[dc]"></a>ble_pkcs7_pad</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, voyah_ble.o(i.ble_pkcs7_pad))
@@ -1339,8 +1339,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_pack
 </UL>
 
-<P><STRONG><a name="[50]"></a>ble_protocol_handle_task</STRONG> (Thumb, 20 bytes, Stack size 8 bytes, voyah_ble.o(i.ble_protocol_handle_task))
-<BR><BR>[Stack]<UL><LI>Max Depth = 776<LI>Call Chain = ble_protocol_handle_task &rArr; ble_protocol_tx &rArr; protocol_tx_handle_author_ack1 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
+<P><STRONG><a name="[50]"></a>ble_protocol_handle_task</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, voyah_ble.o(i.ble_protocol_handle_task))
+<BR><BR>[Stack]<UL><LI>Max Depth = 776<LI>Call Chain = ble_protocol_handle_task &rArr; ble_protocol_tx &rArr; protocol_tx_handle_author_ack2 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_protocol_tx
 <LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_protocol_rx
@@ -1358,11 +1358,11 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_protocol_handle_task
 </UL>
 
-<P><STRONG><a name="[e0]"></a>ble_protocol_tx</STRONG> (Thumb, 114 bytes, Stack size 152 bytes, voyah_ble.o(i.ble_protocol_tx))
-<BR><BR>[Stack]<UL><LI>Max Depth = 768<LI>Call Chain = ble_protocol_tx &rArr; protocol_tx_handle_author_ack1 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
+<P><STRONG><a name="[e0]"></a>ble_protocol_tx</STRONG> (Thumb, 116 bytes, Stack size 152 bytes, voyah_ble.o(i.ble_protocol_tx))
+<BR><BR>[Stack]<UL><LI>Max Depth = 768<LI>Call Chain = ble_protocol_tx &rArr; protocol_tx_handle_author_ack2 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;share_data_read
-<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack1
+<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack2
 </UL>
 <BR>[Called By]<UL><LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_protocol_handle_task
 </UL>
@@ -1754,8 +1754,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;can_protocol_rx
 </UL>
 
-<P><STRONG><a name="[e3]"></a>protocol_tx_handle_author_ack1</STRONG> (Thumb, 172 bytes, Stack size 240 bytes, voyah_ble.o(i.protocol_tx_handle_author_ack1))
-<BR><BR>[Stack]<UL><LI>Max Depth = 616<LI>Call Chain = protocol_tx_handle_author_ack1 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
+<P><STRONG><a name="[e3]"></a>protocol_tx_handle_author_ack2</STRONG> (Thumb, 180 bytes, Stack size 240 bytes, voyah_ble.o(i.protocol_tx_handle_author_ack2))
+<BR><BR>[Stack]<UL><LI>Max Depth = 616<LI>Call Chain = protocol_tx_handle_author_ack2 &rArr; ble_pack &rArr; aes128_ecb_encrypt &rArr; aes_mixcolumns &rArr; aes_gmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;share_data_read
 <LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_tx_enqueue
@@ -1936,7 +1936,7 @@ Global Symbols
 <LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_ccs
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;can_send_timer
 <LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;can_protocol_tx
-<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack1
+<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack2
 <LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_protocol_tx
 </UL>
 
@@ -2018,7 +2018,7 @@ Global Symbols
 <LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
 </UL>
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fputc
-<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack1
+<LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;protocol_tx_handle_author_ack2
 <LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BLE03_SendCmd
 </UL>
 
