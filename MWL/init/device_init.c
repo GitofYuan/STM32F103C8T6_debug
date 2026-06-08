@@ -17,7 +17,7 @@
 #include "J1939.h"
 
 /* ==============================  DEFINES   =============================== */
-#define GPIO_DEV_NUM   14   /*GPIO设备数量*/
+#define GPIO_DEV_NUM   15   /*GPIO设备数量*/
 #define UART_DEV_NUM   2    /*UART设备数量*/
 #define CAN_DEV_NUM    1    /*CAN设备数量*/
 
@@ -44,6 +44,7 @@ device_ctrl_content_u gpio_init_config[GPIO_DEV_NUM] =
 /*relay_ctrl1*/       {.gpio={GPIO_RESET,         GPIO_RESET,     OUTPUT_PUSH_PULL,         GPIO_PULL_NONE,      OUTPUT_LOW}},
 /*relay_ctrl2*/       {.gpio={GPIO_RESET,         GPIO_RESET,     OUTPUT_PUSH_PULL,         GPIO_PULL_NONE,      OUTPUT_LOW}},
 /*led*/               {.gpio={GPIO_RESET,         GPIO_RESET,     OUTPUT_PUSH_PULL,         GPIO_PULL_NONE,      OUTPUT_LOW}},
+/*key0*/              {.gpio={GPIO_RESET,         GPIO_RESET,     INPUT,                    GPIO_PULL_NONE,      OUTPUT_LOW}},
 };
 const char *gpio_dev_list[GPIO_DEV_NUM] = 
 {
@@ -54,8 +55,8 @@ const char *gpio_dev_list[GPIO_DEV_NUM] =
 
 device_ctrl_content_u uart_init_config[UART_DEV_NUM] = 
 {                     /*收发缓冲区   数据长度   超时时间    传输模式               收发模式       波特率        数据位          停止位         校验位*/  
-/*usart1*/      {.uart={0,           0,          0,          UART_MODE_DMA_RX_TX,  UART_TX_RX,   BAUD_115200,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
-/*usart2*/      {.uart={0,           0,          0,          UART_MODE_POLLING,    UART_TX_RX,   BAUD_115200,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
+/*usart1*/      {.uart={0,           0,          0,          UART_MODE_DMA_RX_TX,  UART_TX_RX,   BAUD_9600,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
+/*usart2*/      {.uart={0,           0,          0,          UART_MODE_POLLING,    UART_TX_RX,   BAUD_9600,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
 };
 const char *uart_dev_list[UART_DEV_NUM] = 
 {

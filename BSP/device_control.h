@@ -182,6 +182,7 @@ static DeviceRuntimeInfo dev_list[MAX_DEVICE_CNT] =
     {DEV_TYPE_GPIO,   "relay_ctrl1",       false,       .hw_res.gpio={GPIOB, GPIO_PIN_3}},
     {DEV_TYPE_GPIO,   "relay_ctrl2",       false,       .hw_res.gpio={GPIOB, GPIO_PIN_4}},
     {DEV_TYPE_GPIO,   "led",               false,       .hw_res.gpio={GPIOA, GPIO_PIN_8}},
+    {DEV_TYPE_GPIO,   "key0",              false,       .hw_res.gpio={GPIOC, GPIO_PIN_13}},
     /*UART*/
     {DEV_TYPE_UART,   "usart1",            false,       .hw_res.uart={&huart1, USART1, UART_MODE_DMA_RX_TX, UART_TX_RX}},
     {DEV_TYPE_UART,   "usart2",            false,       .hw_res.uart={&huart2, USART2, UART_MODE_POLLING, UART_TX_RX}},

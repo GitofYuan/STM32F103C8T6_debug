@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include "device_control.h"
 /* ==============================  DEFINES   =============================== */
-#define UART_SEND_INTERVAL      100     /*两帧之间发送的最小间隔 ms*/
+#define UART_SEND_INTERVAL      1     /*两帧之间发送的最小间隔 ms*/
 #define UART_DATA_QUEUE_NUM     3     /*UART数据数据队列数量*/
 #define UART_DATA_MAX           128    /*UART单次最大可收发字节数*/
 

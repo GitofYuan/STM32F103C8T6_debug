@@ -13,6 +13,7 @@
 #include "can_protocol_handle.h"
 #include "uart_bus.h"
 #include "voyah_ble.h"
+#include "voyah_rf.h"
 /* ==============================  DEFINES   =============================== */
 
 /* ==============================   ENUMS    =============================== */
@@ -26,6 +27,7 @@ static uint8_t  R485_tx_buf[UART_DATA_MAX] = {0};           /*R485发送缓冲�
 uint8_t chm_send[8] = {0};
 //Can_Rcv_Data can_send_data;
 
+static uint8_t key0_state = 0; /*按键状态，0表示未按下，1表示按下*/
 
 
 
@@ -47,25 +49,21 @@ void APL_Task(void *argument)
     for(;;)
     {
         osDelay(1);
-        
-        ble_protocol_handle_task();
-        if(R485_tx_flag >= 200)
+        device_ctrl_content_u content;
+        device_control(DEV_TYPE_GPIO, "key0", DEV_CTRL_READ, &content);
+        if(content.gpio.level == GPIO_SET)
         {
-            
-//            uart_data_s data = {0};
-//            data.len = snprintf((char*)R485_tx_buf, UART_DATA_MAX, "HELLO\r\n");
-//            memcpy(data.data, R485_tx_buf, data.len);
-//            data.timeout = data.len;
-//            uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &data);
-//            
-//            printf("send bt: HELLO\n");
-//            
-            R485_tx_flag = 0;
-            
+            key0_state++;
+            if(key0_state > 100)
+            {
+                rf_command_send();
+                key0_state = 0;
+            }
         }
-        R485_tx_flag ++;
-
-        
+        else
+        {
+            key0_state = 0;
+        }
     }
     /* USER CODE END APL_Task */
 }
