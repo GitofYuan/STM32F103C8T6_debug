@@ -108,24 +108,30 @@ static bool uart_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *conte
        return false;
     }
     
-    /*预留*/
+    /* 根据模式选择是否启动接收（或其它预留操作） */
     switch(content->uart.mode)
     {
        case UART_MODE_IT_RX:
        case UART_MODE_IT_RX_TX:
            HAL_UART_Receive_IT(huart, uart1_rx_buf, UART_DATA_MAX);
-           __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE); 
+           __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);
            break;
        case UART_MODE_DMA_RX:
        case UART_MODE_DMA_RX_TX:
-           HAL_UART_Receive_DMA(huart, uart1_rx_buf, UART_DATA_MAX);
+           if (HAL_UART_Receive_DMA(huart, uart1_rx_buf, UART_DATA_MAX) != HAL_OK)
+           {
+               return false;
+           }
            __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);
            break;
+       case UART_MODE_POLLING:
+       case UART_MODE_IT_TX:
+       case UART_MODE_DMA_TX:
        default:
-           return false;
+           /* 其他模式在初始化时无需额外动作 */
+           break;
     }
 
-    // 初始化设备状态
     dev->is_opened = true; // UART初始化后需手动打开
     return true;
 }
@@ -213,10 +219,7 @@ bool uart_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, de
                         break;
                     case UART_MODE_DMA_TX:
                     case UART_MODE_DMA_RX_TX:
-                        /* 当前UART发送队列实现为同步出队后立即释放缓冲区，
-                           所以这里不使用DMA异步发送，改为同步阻塞发送以避免
-                           DMA传输过程中发送缓冲区被覆盖。 */
-                        if (HAL_UART_Transmit(huart, content->uart.buf, content->uart.len, content->uart.timeout_ms) != HAL_OK)
+                        if (HAL_UART_Transmit_DMA(huart, content->uart.buf, content->uart.len) != HAL_OK)
                         {
                             return false;
                         }
@@ -275,6 +278,16 @@ void USART1_IRQHandler(void)
         HAL_UART_Receive_DMA(&huart1, uart1_rx_buf, UART_DATA_MAX); /* 重新启动DMA接收 */
     }
     HAL_UART_IRQHandler(&huart1);
+}
+
+/**
+ * HAL UART Tx complete callback (called from HAL IRQ handler).
+ * Forward to uart bus to handle queue removal and start next send.
+ */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    /* 转发到 uart_bus 的回调处理（最小工作量，uart_bus 会在 IRQ 上做原子出队操作） */
+    uart_dma_tx_complete(huart);
 }
 
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

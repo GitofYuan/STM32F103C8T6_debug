@@ -16,9 +16,8 @@
 #include <stdbool.h>
 #include "device_control.h"
 /* ==============================  DEFINES   =============================== */
-#define UART_SEND_INTERVAL      1     /*两帧之间发送的最小间隔 ms*/
 #define UART_DATA_QUEUE_NUM     3     /*UART数据数据队列数量*/
-#define UART_DATA_MAX           128    /*UART单次最大可收发字节数*/
+#define UART_DATA_MAX           50    /*UART单次最大可收发字节数*/
 
 #define DEBUG_UART_BUS            /*debug使能，完整保留“DEBUG_UART_BUS”为使能debug*/
 /* ==============================   ENUMS    =============================== */
@@ -87,5 +86,7 @@ bool uart_tx_enqueue(uart_chnl_e chnl, uart_data_s* data);
 *****************************************************************************************************/
 void uart_tx_dequeue(void);
 
+/* Called by HAL UART Tx complete callback to notify the bus that DMA transfer finished */
+void uart_dma_tx_complete(UART_HandleTypeDef *huart);
 #endif
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

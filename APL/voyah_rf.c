@@ -38,7 +38,7 @@ typedef struct
 uint8_t long_preamble[25] = {0};
 const uint8_t long_frame_preamble[] = {0x00, 0x00};
 const uint8_t long_frame_start_bit_id[] = {0xA5, 0x5A};
-uint8_t long_frame_data[] = {0x81, 0x1D, 0xCD, 0x65, 0x00, 0x10};
+uint8_t long_frame_data[] = {0x81, 0x00, 0x65, 0xCD, 0x1D, 0x10};
 uint8_t long_frame_gun_maker[] = {0x00, 0x01, 0x00, 0x00};
 const uint8_t long_frame_reserved[] = {0x00, 0x00, 0x00, 0x00};
 
@@ -52,7 +52,7 @@ uint8_t button_release_data[] = {0x82, 0x00, 0x00, 0x00, 0x00, 0x10};
 long_frame_t       long_frame;
 button_release_t   button_release;
 
-uint8_t rf_tx_buffer[50];
+//uint8_t rf_tx_buffer[50];
 
 uint8_t send_flag = 0;
 
@@ -192,48 +192,48 @@ void rf_command_send(void)
 
     
     // 发送
-//    uart_data_s rf_tx_data = {0};
-//    rf_tx_data.len = manchester_get_encoded_len(sizeof(long_preamble));
-//    manchester_encoded_hex(long_preamble, sizeof(long_preamble), rf_tx_data.data);
-//    rf_tx_data.timeout = 26;
-//    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &rf_tx_data);
-//    
-//    
-//    rf_tx_data.len = manchester_get_encoded_len(sizeof(long_frame));
-//    manchester_encoded_hex((uint8_t *)&long_frame, sizeof(long_frame), rf_tx_data.data);
-//    rf_tx_data.timeout = 19;
-//    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &rf_tx_data);
+    uart_data_s rf_tx_data = {0};
+    rf_tx_data.len = manchester_get_encoded_len(sizeof(long_preamble));
+    manchester_encoded_hex(long_preamble, sizeof(long_preamble), rf_tx_data.data);
+    rf_tx_data.timeout = 50;
+    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &rf_tx_data);
+    
+    
+    rf_tx_data.len = manchester_get_encoded_len(sizeof(long_frame));
+    manchester_encoded_hex((uint8_t *)&long_frame, sizeof(long_frame), rf_tx_data.data);
+    rf_tx_data.timeout = 50;
+    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &rf_tx_data);
 
-//    osDelay(200+26+19+200);
-//    rf_tx_data.len = manchester_get_encoded_len(sizeof(long_preamble));
-//    manchester_encoded_hex(long_preamble, sizeof(long_preamble), rf_tx_data.data);
-//    rf_tx_data.timeout = 26;
-//    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &rf_tx_data);
-//    
-//    rf_tx_data.len = manchester_get_encoded_len(sizeof(long_frame));
-//    manchester_encoded_hex((uint8_t *)&long_frame, sizeof(long_frame), rf_tx_data.data);
-//    rf_tx_data.timeout = 19;
-//    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &rf_tx_data);
-    
-    uint8_t long_preamble_m_len = 0;
-    uint8_t long_frame_m_len = 0;
-    
-    long_preamble_m_len = manchester_get_encoded_len(sizeof(long_preamble));
-    manchester_encoded_hex(long_preamble, sizeof(long_preamble), rf_tx_buffer);
-    HAL_UART_Transmit_DMA(&huart1, rf_tx_buffer, long_preamble_m_len);
-    
-    long_frame_m_len = manchester_get_encoded_len(sizeof(long_frame));
-    manchester_encoded_hex((uint8_t *)&long_frame, sizeof(long_frame), rf_tx_buffer);
-    HAL_UART_Transmit_DMA(&huart1, rf_tx_buffer, long_frame_m_len);
-    
     osDelay(200+26+19+200);
-    long_preamble_m_len = manchester_get_encoded_len(sizeof(long_preamble));
-    manchester_encoded_hex(long_preamble, sizeof(long_preamble), rf_tx_buffer);
-    HAL_UART_Transmit_DMA(&huart1, rf_tx_buffer, long_preamble_m_len);
+    rf_tx_data.len = manchester_get_encoded_len(sizeof(long_preamble));
+    manchester_encoded_hex(long_preamble, sizeof(long_preamble), rf_tx_data.data);
+    rf_tx_data.timeout = 50;
+    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &rf_tx_data);
     
-    long_frame_m_len = manchester_get_encoded_len(sizeof(long_frame));
-    manchester_encoded_hex((uint8_t *)&long_frame, sizeof(long_frame), rf_tx_buffer);
-    HAL_UART_Transmit_DMA(&huart1, rf_tx_buffer, long_frame_m_len);
+    rf_tx_data.len = manchester_get_encoded_len(sizeof(long_frame));
+    manchester_encoded_hex((uint8_t *)&long_frame, sizeof(long_frame), rf_tx_data.data);
+    rf_tx_data.timeout = 50;
+    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &rf_tx_data);
+    
+//    uint8_t long_preamble_m_len = 0;
+//    uint8_t long_frame_m_len = 0;
+//    
+//    long_preamble_m_len = manchester_get_encoded_len(sizeof(long_preamble));
+//    manchester_encoded_hex(long_preamble, sizeof(long_preamble), rf_tx_buffer);
+//    HAL_UART_Transmit_DMA(&huart1, rf_tx_buffer, long_preamble_m_len);
+//    
+//    long_frame_m_len = manchester_get_encoded_len(sizeof(long_frame));
+//    manchester_encoded_hex((uint8_t *)&long_frame, sizeof(long_frame), rf_tx_buffer);
+//    HAL_UART_Transmit_DMA(&huart1, rf_tx_buffer, long_frame_m_len);
+//    
+//    osDelay(200+26+19+200);
+//    long_preamble_m_len = manchester_get_encoded_len(sizeof(long_preamble));
+//    manchester_encoded_hex(long_preamble, sizeof(long_preamble), rf_tx_buffer);
+//    HAL_UART_Transmit_DMA(&huart1, rf_tx_buffer, long_preamble_m_len);
+//    
+//    long_frame_m_len = manchester_get_encoded_len(sizeof(long_frame));
+//    manchester_encoded_hex((uint8_t *)&long_frame, sizeof(long_frame), rf_tx_buffer);
+//    HAL_UART_Transmit_DMA(&huart1, rf_tx_buffer, long_frame_m_len);
     
 //    osDelay(200+26+19+200);
 //    button_release_m_len = manchester_get_encoded_len(sizeof(button_release));

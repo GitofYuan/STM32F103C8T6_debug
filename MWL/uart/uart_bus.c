@@ -37,12 +37,13 @@ uart_data_pointer_s    s_uart_rx_data_pointer[UART_DATA_CHNL_NUM_MAX];          
 uart_data_queue        s_uart_tx_data_queue[UART_DATA_CHNL_NUM_MAX][UART_DATA_QUEUE_NUM];   /*UART发送数据队列*/
 uart_data_pointer_s    s_uart_tx_data_pointer[UART_DATA_CHNL_NUM_MAX];                      /*UART发送数据队列指针*/
 
-static uint8_t uart_send_interval_timmer[UART_DATA_CHNL_NUM_MAX] = {0};   /*UART通道报文发送间隔计时器，ms*/
-
 uint8_t uart_addr[UART_DATA_CHNL_NUM_MAX] = {0};   /*各UART通道的设备地址*/
 
 static uint8_t print_buf[UART_DATA_MAX] = {0};
 static uint8_t print_len = 0;
+
+/* Per-channel busy flag when DMA transfer in progress */
+static volatile uint8_t s_uart_tx_busy[UART_DATA_CHNL_NUM_MAX] = {0};
 
 //int fputc(int ch,FILE *f);
 /* ========================= FUNCTION PROTOTYPES =========================== */
@@ -320,16 +321,6 @@ bool uart_send(uart_chnl_e chnl, uart_data_s* data)
     content.uart.len = data->len;                      /*设置标准ID*/
     content.uart.buf = data->data;                     /*设置扩展ID*/
     
-    /*设置超时时间，如果timeout大于发送间隔，则使用发送间隔，否则使用正常输入的timeout*/
-    if(data->timeout >= UART_SEND_INTERVAL)
-    {
-        content.uart.timeout_ms = UART_SEND_INTERVAL;
-    }
-    else
-    {
-        content.uart.timeout_ms = data->timeout;              
-    }
-    
     switch(chnl)
     {
         case UART_DATA_QUEUE_CHNL_1:
@@ -387,10 +378,9 @@ void uart_tx_dequeue(void)
     uart_chnl_e chnl;
     for(chnl = UART_DATA_QUEUE_CHNL_1; chnl < UART_DATA_CHNL_NUM_MAX; chnl++)
     {
-        uart_send_interval_timmer[chnl]++;
         if ((s_uart_tx_data_pointer[chnl].tail == NULL)
             ||(s_uart_tx_data_pointer[chnl].head == NULL)
-            ||(uart_send_interval_timmer[chnl] < UART_SEND_INTERVAL))   /*空队列或未到最小发送时间间隔*/
+            ||s_uart_tx_busy[chnl] == 1)   /*空队列或发送中断忙*/
         {
             continue;
         }
@@ -402,23 +392,75 @@ void uart_tx_dequeue(void)
             {
                 if(uart_send(chnl, &(s_uart_tx_data_pointer[chnl].head->uart_data)) == true)
                 {
-                    memset(&s_uart_tx_data_pointer[chnl].head->uart_data, 0 ,sizeof(uart_data_s));
-                    s_uart_tx_data_pointer[chnl].head = NULL;
-                    s_uart_tx_data_pointer[chnl].tail = NULL;
-                    uart_send_interval_timmer[chnl] = 0;
+                    /* 标记为发送中，实际出队将在 DMA 完成回调中进行 */
+                    s_uart_tx_busy[chnl] = 1;
                 }
             }
             else
             {
                 if(uart_send(chnl, &(s_uart_tx_data_pointer[chnl].head->uart_data)) == true)
                 {
-                    memset(&s_uart_tx_data_pointer[chnl].head->uart_data, 0 ,sizeof(uart_data_s));
-                    s_uart_tx_data_pointer[chnl].head =  s_uart_tx_data_pointer[chnl].head->p_next;
-                    uart_send_interval_timmer[chnl] = 0;
+                    /* 标记为发送中，实际出队将在 DMA 完成回调中进行 */
+                    s_uart_tx_busy[chnl] = 1;
                 }
             }
         }
     }
+}
+
+/**
+ * Called from HAL UART Tx complete callback (IRQ context).
+ * Performs minimal, atomic queue removal and clears busy flag for the channel.
+ */
+void uart_dma_tx_complete(UART_HandleTypeDef *huart)
+{
+    /* 找到对应的通道 */
+    uart_chnl_e chnl = UART_DATA_CHNL_NUM_MAX;
+    for (int i = 0; i < MAX_DEVICE_CNT; i++)
+    {
+        if (dev_list[i].type == DEV_TYPE_UART && dev_list[i].hw_res.uart.huart == huart)
+        {
+            if (strcmp(dev_list[i].name, "usart1") == 0)
+            {
+                chnl = UART_DATA_QUEUE_CHNL_1;
+                break;
+            }
+            else if (strcmp(dev_list[i].name, "usart2") == 0)
+            {
+                chnl = UART_DATA_QUEUE_CHNL_2;
+                break;
+            }
+        }
+    }
+    if (chnl >= UART_DATA_CHNL_NUM_MAX)
+    {
+        return; /* 未匹配到 */
+    }
+
+    __set_PRIMASK(1);
+    if ((s_uart_tx_data_pointer[chnl].tail == NULL) || (s_uart_tx_data_pointer[chnl].head == NULL))
+    {
+        /* nothing */
+    }
+    else
+    {
+        /* 出队已发送的头节点 */
+        if (s_uart_tx_data_pointer[chnl].head == s_uart_tx_data_pointer[chnl].tail)
+        {
+            memset(&s_uart_tx_data_pointer[chnl].head->uart_data, 0 ,sizeof(uart_data_s));
+            s_uart_tx_data_pointer[chnl].head = NULL;
+            s_uart_tx_data_pointer[chnl].tail = NULL;
+        }
+        else
+        {
+            memset(&s_uart_tx_data_pointer[chnl].head->uart_data, 0 ,sizeof(uart_data_s));
+            s_uart_tx_data_pointer[chnl].head = s_uart_tx_data_pointer[chnl].head->p_next;
+        }
+    }
+    __set_PRIMASK(0);
+
+    /* 清除忙标记并重置发送间隔 */
+    s_uart_tx_busy[chnl] = 0;
 }
 
 /*****************************************************************************************************
@@ -442,7 +484,7 @@ int fputc(int ch,FILE *f)
         uart_data_s print_data;
         print_data.len = print_len;
         memcpy(print_data.data, print_buf, print_len);
-        print_data.timeout = UART_SEND_INTERVAL;
+        print_data.timeout = print_data.len;
         uart_tx_enqueue(UART_DATA_QUEUE_CHNL_2, &print_data);
         
         print_len = 0;

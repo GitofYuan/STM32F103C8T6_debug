@@ -21,10 +21,10 @@
 /* ======================== STRUCTURES AND UNIONS ========================== */
 
 /* ==============================  EXTERNS   =============================== */
-static uint8_t send_flag = 0;
-static uint16_t R485_tx_flag = 0;    
-static uint8_t  R485_tx_buf[UART_DATA_MAX] = {0};           /*R485发送缓冲区，大小根据实际需求定义*/
-uint8_t chm_send[8] = {0};
+//static uint8_t send_flag = 0;
+//static uint16_t R485_tx_flag = 0;    
+//static uint8_t  R485_tx_buf[UART_DATA_MAX] = {0};           /*R485发送缓冲区，大小根据实际需求定义*/
+//uint8_t chm_send[8] = {0};
 //Can_Rcv_Data can_send_data;
 
 static uint8_t key0_state = 0; /*按键状态，0表示未按下，1表示按下*/

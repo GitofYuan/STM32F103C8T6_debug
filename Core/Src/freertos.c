@@ -41,7 +41,6 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-device_ctrl_content_u huart1_cotent = {.uart={0,         0,        0,        UART_MODE_DMA_RX_TX,  UART_TX_RX,   BAUD_9600,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}};
 
 /* USER CODE END PM */
 
@@ -67,7 +66,7 @@ const osThreadAttr_t BSP_Task1_attributes = {
 osThreadId_t APL_Task1Handle;
 const osThreadAttr_t APL_Task1_attributes = {
   .name = "APL_Task1",
-  .stack_size = 512 * 4,
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for CAN_Task1 */
