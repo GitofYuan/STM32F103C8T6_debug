@@ -3,8 +3,8 @@
 * FileName          : uart_bus.c
 * Author            : Yuan.Zong
 * Version           : V1.0.0/2025.12.18
-* Description       : 当前UART_BUS初步调试完成，但是还没有实现关联UART通道地址以对
-                      接收到的UART数据进行过滤，后续一定需要再完善。
+* Description       : 当前UART_BUS适用于DMA模式的数据接收和发送，如果不是DMA模式的uart可能会有
+                      问题。
 ******************************************************************************/
 /* ==============================  INCLUDES  =============================== */
 #include <string.h>
@@ -408,6 +408,14 @@ void uart_tx_dequeue(void)
     }
 }
 
+/*****************************************************************************************************
+*Function   :uart_dma_tx_complete（DMA发送完成回调函数）
+*Description:
+*Input      :UART_HandleTypeDef *huart  UART句柄
+*Output     :
+*Returns    :
+*Note       :该函数在DMA发送完成时调用，用于处理发送完成，并清空发送队列。
+*****************************************************************************************************/
 /**
  * Called from HAL UART Tx complete callback (IRQ context).
  * Performs minimal, atomic queue removal and clears busy flag for the channel.
