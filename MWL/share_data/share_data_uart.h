@@ -124,6 +124,8 @@ typedef struct
     vehicle_position_e       vehicle_position;       /*车辆位置判断*/
     charger_arm_status_e     charger_arm_status;     /*机械臂运行状态*/
     arm_fail_reason_e        arm_fail_reason;        /*机械臂失败原因*/
+    uint8_t                  recv_vin[17];           /*接收的VIN码*/
+    
 }ble_frame_t;
 /* ==============================  EXTERNS   =============================== */
 

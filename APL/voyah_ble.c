@@ -28,7 +28,7 @@ const ble_frame_attribute_t ble_frame_attribute[BLE_FRAME_MAX] =
 };
 
 /*定义所有枪及其所有蓝牙报文的发送定时器*/
-ble_frame_send_timer_t ble_frame_send_timer[CHAR_GUN_NUM][BLE_FRAME_MAX] = {0};     /*蓝牙报文发送定时器*/
+ble_frame_send_timer_t ble_frame_send_timer[BLE_FRAME_MAX] = {0};     /*蓝牙报文发送定时器*/
 
 /*AES S-box 代换表*/
 static const uint8_t sbox[256] = {
@@ -87,8 +87,8 @@ atk_ble03_init_data_t ble_init_data =
     .uuid = "EEEE",
 };
 
-///* 车辆VIN码的唯一定义（避免在头文件中重复定义） */
-//uint8_t VIN[17] = "LSVAGGAE9N100001";   /*车辆VIN码，长度为17字节*/
+/* 车辆VIN码的唯一定义（避免在头文件中重复定义） */
+uint8_t VIN[17] = "LMMMMMMMMMMMM1102";   /*车辆VIN码，长度为17字节*/
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
 *Function   :16字节密钥生成函数
@@ -144,9 +144,13 @@ uint16_t ble_crc16_ibm(const uint8_t* data, uint8_t len)
         for (uint8_t j = 0; j < 8; j++)
         {
             if (crc & 0x0001)
+            {
                 crc = (crc >> 1) ^ 0xA001; // CRC-16-IBM
+            }
             else
+            {
                 crc >>= 1;
+            }
         }
     }
     return crc;
@@ -191,7 +195,9 @@ static void aes_key_expand(const uint8_t *key, uint32_t *w)
 static void aes_subbytes(uint8_t *state)
 {
     for (int i = 0; i < 16; i++)
+    {
         state[i] = sbox[state[i]];
+    }
 }
 
 /*****************************************************************************************************
@@ -350,22 +356,18 @@ uint8_t ble_pack(const ble_plain_t *data, const uint8_t *vin, ble_frame_data_t *
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
+*Function   :protocol_tx_handle_author_ack1（鉴权应答1）
+*Description:从共享内容中读取鉴权结果和车辆VIN码，封装成蓝牙报文并发送
 *Input      :
 *Output     :
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-void protocol_tx_handle_author_ack1(uint8_t gun_num)
+void protocol_tx_handle_author_ack1(void)
 {
     author_ret_e             author_ret;             /*鉴权结果*/
-    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].author_ret);
+    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.author_ret);
     share_data_read(MESURE_INFO, mesure_offset, &author_ret, sizeof(author_ret_e));
-
-    uint8_t vin[17] = {0};                   /*车辆VIN码*/
-    uint32_t vin_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].bms_vin);
-    share_data_read(MESURE_INFO, vin_offset, vin, sizeof(vin));
 
     ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
     plain_data.plain_len = ble_frame_attribute[BLE_AUTHOR_ACK1].size;
@@ -377,7 +379,7 @@ void protocol_tx_handle_author_ack1(uint8_t gun_num)
 
     // 发送
     uart_data_s ble_tx_data = {0};
-    ble_tx_data.len = ble_pack(&plain_data, vin, &frame_data);
+    ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
     ble_tx_data.data[0] = frame_data.frame_head;
     ble_tx_data.data[1] = frame_data.effective_len;
     memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
@@ -388,26 +390,22 @@ void protocol_tx_handle_author_ack1(uint8_t gun_num)
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
+*Function   :protocol_tx_handle_author_ack2（鉴权应答2）
+*Description:从共享内容中读取鉴权失败原因和设备类型，封装成蓝牙报文并发送
 *Input      :
 *Output     :
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-void protocol_tx_handle_author_ack2(uint8_t gun_num)
+void protocol_tx_handle_author_ack2(void)
 {
     struct
     {
         author_fail_reason_e     fail_reason;            /*鉴权失败原因*/
         charger_device_type_e    device_type;            /*设备类型*/
     }author_ack2;
-    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].fail_reason);
+    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.fail_reason);
     share_data_read(MESURE_INFO, mesure_offset, &author_ack2, sizeof(author_ack2));
-
-    uint8_t vin[17] = {0};                   /*车辆VIN码*/
-    uint32_t vin_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].bms_vin);
-    share_data_read(MESURE_INFO, vin_offset, vin, sizeof(vin));
 
     ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
     plain_data.plain_len = ble_frame_attribute[BLE_AUTHOR_ACK2].size;
@@ -421,7 +419,7 @@ void protocol_tx_handle_author_ack2(uint8_t gun_num)
 
     // 发送
     uart_data_s ble_tx_data = {0};
-    ble_tx_data.len = ble_pack(&plain_data, vin, &frame_data);
+    ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
     ble_tx_data.data[0] = frame_data.frame_head;
     ble_tx_data.data[1] = frame_data.effective_len;
     memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
@@ -432,14 +430,14 @@ void protocol_tx_handle_author_ack2(uint8_t gun_num)
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
+*Function   :protocol_tx_handle_auto_charge_ack（自动充电请求应答）
+*Description:从共享内容中读取自动充电请求应答信息，封装成蓝牙报文并发送
 *Input      :
 *Output     :
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-void protocol_tx_handle_auto_charge_ack(uint8_t gun_num)
+void protocol_tx_handle_auto_charge_ack(void)
 {
     struct
     {
@@ -447,12 +445,8 @@ void protocol_tx_handle_auto_charge_ack(uint8_t gun_num)
         charger_arm_status_e     charger_arm_status;     /*机械臂运行状态*/
         arm_fail_reason_e        arm_fail_reason;        /*机械臂失败原因*/
     }auto_charge_ack;
-    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].vehicle_position);
+    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.vehicle_position);
     share_data_read(MESURE_INFO, mesure_offset, &auto_charge_ack, sizeof(auto_charge_ack));
-
-    uint8_t vin[17] = {0};                   /*车辆VIN码*/
-    uint32_t vin_offset = OFFSET_OF(mesure_info_t, ble_frame[gun_num].bms_vin);
-    share_data_read(MESURE_INFO, vin_offset, vin, sizeof(vin));
 
     ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
     plain_data.plain_len = ble_frame_attribute[BLE_AUTO_CHARGE_ACK].size;
@@ -467,7 +461,7 @@ void protocol_tx_handle_auto_charge_ack(uint8_t gun_num)
 
     // 发送
     uart_data_s ble_tx_data = {0};
-    ble_tx_data.len = ble_pack(&plain_data, vin, &frame_data);
+    ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
     ble_tx_data.data[0] = frame_data.frame_head;
     ble_tx_data.data[1] = frame_data.effective_len;
     memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
@@ -478,8 +472,9 @@ void protocol_tx_handle_auto_charge_ack(uint8_t gun_num)
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
+*Function   :ble_protocol_tx（蓝牙协议发送）
+*Description:蓝牙协议发送函数，遍历每个枪号和每个报文类型，根据共享内存中的控制属性表判断是否需要发送报文，
+             并调用相应的处理函数进行报文封装和发送
 *Input      :
 *Output     :
 *Returns    :
@@ -491,49 +486,45 @@ void ble_protocol_tx(void)
     control_info_t control_info;
     share_data_read(CONTROL_INFO, 0, &control_info, sizeof(control_info_t));
 
-    /*以下是27930报文发送遍历处理*/
+    /*以下是蓝牙报文发送遍历处理*/
     uint8_t  frame;
-    uint8_t char_gun_num;
-    for(char_gun_num = 0; char_gun_num < CHAR_GUN_NUM; char_gun_num++)
+
+    for(frame = 0; frame < BLE_FRAME_MAX; frame++)
     {
-        for(frame = 0; frame < BLE_FRAME_MAX; frame++)
+        uint8_t send_flag = control_info.ble_uart_control[frame].send_flag;
+        if(send_flag == 0)
         {
-            uint8_t send_flag = control_info.ble_uart_control[char_gun_num][frame].send_flag;
-            if(send_flag == 0)
+            switch(frame)
             {
-                switch(frame)
-                {
-                case BLE_AUTHOR:
-                    /* code */
-                    break;
-                case BLE_AUTHOR_ACK1:
-//                    protocol_tx_handle_author_ack1(char_gun_num);
-                    break;
-                case BLE_AUTHOR_ACK2:
-                    protocol_tx_handle_author_ack2(char_gun_num);
-                    break;
-                case BLE_AUTO_CHARGE:
-                    /* code */
-                    break;
-                case BLE_AUTO_CHARGE_ACK:
-//                    protocol_tx_handle_auto_charge_ack(char_gun_num);
-                    break;
-                
-                default:
-                    break;
-                } 
-            }
-            /*这里要特别注意下，如果发现报文发送标志位为置为0，则说明该报文已经发送完成，则将报文发送定时器清零*/
-            else
-            {
-                memset(&ble_frame_send_timer[char_gun_num][frame], 0, sizeof(ble_frame_send_timer_t));
-            }
+            case BLE_AUTHOR:
+                /* code */
+                break;
+            case BLE_AUTHOR_ACK1:
+//                    protocol_tx_handle_author_ack1();
+                break;
+            case BLE_AUTHOR_ACK2:
+                protocol_tx_handle_author_ack2();
+                break;
+            case BLE_AUTO_CHARGE:
+                /* code */
+                break;
+            case BLE_AUTO_CHARGE_ACK:
+//                    protocol_tx_handle_auto_charge_ack();
+                break;
+            
+            default:
+                break;
+            } 
+        }
+        /*这里要特别注意下，如果发现报文发送标志位为置为0，则说明该报文已经发送完成，则将报文发送定时器清零*/
+        else
+        {
+            memset(&ble_frame_send_timer[frame], 0, sizeof(ble_frame_send_timer_t));
         }
     }
-
 }
 
-/* ========================= 报文解析 =========================== */
+/* ========================= 报文接收解析 =========================== */
 /*****************************************************************************************************
 *Function   :PKCS7数据去除填充函数
 *Description:去除报文数据的PKCS7填充
@@ -541,7 +532,6 @@ void ble_protocol_tx(void)
              uint8_t data_len 数据长度（字节）
 *Output     :uint8_t* data  去除填充后的数据缓冲区
 *Returns    :去除填充后的数据长度（字节）
-
 *Note       :
 *****************************************************************************************************/
 uint8_t ble_pkcs7_unpad(uint8_t* data, uint8_t data_len)
@@ -572,18 +562,30 @@ uint8_t ble_pkcs7_unpad(uint8_t* data, uint8_t data_len)
     return data_len - pad_len;
 }
 
-/**
- * @brief  AES逆字节替换
- */
+/*****************************************************************************************************
+*Function   :aes_invsubbytes（AES逆字节替换）
+*Description:执行AES逆字节替换操作
+*Input      :uint8_t *state  状态缓冲区指针
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
 static void aes_invsubbytes(uint8_t *state)
 {
     for (int i = 0; i < 16; i++)
+    {
         state[i] = rsbox[state[i]];
+    }
 }
 
-/**
- * @brief  AES逆行移位
- */
+/*****************************************************************************************************
+*Function   :aes_invshiftrows（AES逆行移位）
+*Description:执行AES逆行移位操作
+*Input      :uint8_t *state  状态缓冲区指针
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
 static void aes_invshiftrows(uint8_t *state)
 {
     uint8_t t;
@@ -593,9 +595,14 @@ static void aes_invshiftrows(uint8_t *state)
     t = state[3]; state[3] = state[7]; state[7] = state[11]; state[11] = state[15]; state[15] = t;
 }
 
-/**
- * @brief  AES逆列混合
- */
+/*****************************************************************************************************
+*Function   :aes_invmixcolumns（AES逆列混合）
+*Description:执行AES逆列混合操作
+*Input      :uint8_t *state  状态缓冲区指针
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
 static void aes_invmixcolumns(uint8_t *state)
 {
     for (int i = 0; i < 16; i += 4)
@@ -608,9 +615,15 @@ static void aes_invmixcolumns(uint8_t *state)
     }
 }
 
-/**
- * @brief  AES128-ECB 单块解密（16字节）
- */
+/*****************************************************************************************************
+*Function   :aes128_ecb_decrypt（AES128-ECB 单块解密（16字节））
+*Description:执行AES128-ECB单块解密操作
+*Input      :const uint8_t *in   输入数据指针
+             const uint8_t *key  密钥指针
+*Output     :uint8_t *out   输出数据指针
+*Returns    :
+*Note       :
+*****************************************************************************************************/
 void aes128_ecb_decrypt(const uint8_t *in, uint8_t *out, const uint8_t *key)
 {
     uint32_t w[44];     /*AES-128密钥扩展后生成的44个32位字（轮密钥）*/
@@ -636,14 +649,17 @@ void aes128_ecb_decrypt(const uint8_t *in, uint8_t *out, const uint8_t *key)
     memcpy(out, state, AES_BLOCK_SIZE);
 }
 
-
-
-
-
-/**
- * @brief  解帧：接收帧 → 业务数据
- * @return 0=成功，-1=帧头错误，-2=CRC错误，-3=长度错误
- */
+/*****************************************************************************************************
+*Function   :ble_unpack（解析接收蓝牙报文）
+*Description:先校验帧头是否为协议帧头，如是则继续，否则返回错误；然后进行CRC校验，如校验成功则继续，否则返回CRC校验失败；
+             然后对数据进行解密，解密后对数据进行去填充，如去填充后的数据有效长度与传输的目标长度一致，则继续，
+             否则返回长度错误；最后将解密后的数据复制到业务数据结构体中
+*Input      :const ble_frame_data_t *frame  接收到的蓝牙报文结构体指针
+             const uint8_t *vin  车辆VIN码，长度为17字节
+*Output     :ble_plain_t *data   解密后的业务数据结构体指针
+*Returns    :0=成功，-1=帧头错误，-2=CRC错误，-3=长度错误
+*Note       :
+*****************************************************************************************************/
 int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *data)
 {
     uint8_t key[AES_KEY_SIZE];
@@ -659,7 +675,9 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
     crc_buf[0] = frame->effective_len;
     memcpy(crc_buf + 1, frame->encrypt_data, BT_MAX_ENC_LEN);
     if (ble_crc16_ibm(crc_buf, 1 + BT_MAX_ENC_LEN) != frame->check_num)
+    {
         return -2;
+    }
 
     // 3. 解密
     ble_gen_key(vin, key);
@@ -670,7 +688,9 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
     // 4. 去填充
     dec_len = ble_pkcs7_unpad(dec_buf, dec_len);
     if (dec_len != frame->effective_len)
+    {
         return -3;
+    }
 
     // 5. 复制业务数据
     memcpy(data, dec_buf, sizeof(ble_plain_t));
@@ -679,12 +699,13 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
+*Function   :ble_protocol_rx（BLE协议接收处理）
+*Description:该函数负责处理接收到的BLE报文数据，首先从BLE接收队列中获取数据，如果接收到数据则进行解析处理，
+             如果报文头为BLE_FRAME_HEAD，则继续解析有效数据长度和报文内容，否则直接返回。
 *Input      :
 *Output     :
 *Returns    :
-*Note       :
+*Note       :报文解析函数待完善，当前仅打印接收到的报文内容
 *****************************************************************************************************/
 void ble_protocol_rx(void)
 {
@@ -697,7 +718,8 @@ void ble_protocol_rx(void)
         if(ble_rx_buf[0] == BLE_FRAME_HEAD)
         {
             effective_len = ble_rx_buf[1];
-            /*处理BLE_AUTHOR_ACK1报文*/
+            /*解析处理报文*/
+            // ble_unpack(&ble_rx_buf, VIN, &data);
         }
         else
         {
@@ -706,12 +728,10 @@ void ble_protocol_rx(void)
     }
 }
 
-
-
 /*****************************************************************************************************
 *Function   :ble_protocol_handle_task（BLE协议处理任务）
-*Description:该函数负责从BLE接收队列中接收BLE报文数据并对其进行解析处理，同时负责轮询BLE报文控制属性表，
-             按照通讯协议要求对BLE报文进行数据整理并发送。
+*Description:首先判断BLE模块是否初始化完成，如果未完成则调用初始化函数进行初始化；
+             如果已完成则调用接收处理函数和发送处理函数。
 *Input      :
 *Output     :
 *Returns    :
@@ -725,8 +745,17 @@ void ble_protocol_handle_task(void)
     }
     else
     {
-        ble_protocol_rx();
-        ble_protocol_tx();
+        if(VIN[0] == 0)
+        {
+            uint32_t vin_offset = OFFSET_OF(mesure_info_t, ble_frame.bms_vin);
+            share_data_read(MESURE_INFO, vin_offset, VIN, sizeof(VIN));
+        }
+        else
+        {
+            ble_protocol_rx();
+            ble_protocol_tx();
+        }
+
     }
 
 }

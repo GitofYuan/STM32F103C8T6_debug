@@ -21,7 +21,7 @@
 #define  BT_MAX_PLAIN_LEN         32         /*最大明文数据长度*/
 #define  BT_MAX_ENC_LEN           32         /*最大加密数据长度*/
 /* ==============================   ENUMS    =============================== */
-//uint8_t VIN[17] = "LSVAGGAE9N100001";   /*车辆VIN码，长度为17字节*/
+
 /* ======================== STRUCTURES AND UNIONS ========================== */
 /* BLE报文信息属性*/
 typedef struct

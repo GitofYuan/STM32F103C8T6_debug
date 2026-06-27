@@ -56,7 +56,7 @@ void APL_Task(void *argument)
             key0_state++;
             if(key0_state > 100)
             {
-                rf_command_send();
+                // rf_command_send();
                 key0_state = 0;
             }
         }
@@ -64,7 +64,9 @@ void APL_Task(void *argument)
         {
             key0_state = 0;
         }
+        ble_protocol_handle_task();
     }
+
     /* USER CODE END APL_Task */
 }
 
