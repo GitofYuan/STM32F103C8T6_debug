@@ -369,29 +369,38 @@ uint8_t ble_pack(const ble_plain_t *data, const uint8_t *vin, ble_frame_data_t *
 *****************************************************************************************************/
 void protocol_tx_handle_author_ack1(void)
 {
-    author_ret_e             author_ret;             /*鉴权结果*/
-    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.author_ret);
-    share_data_read(MESURE_INFO, mesure_offset, &author_ret, sizeof(author_ret_e));
+    if(ble_frame_send_timer[BLE_AUTHOR_ACK1].send_timer <= ble_frame_attribute[BLE_AUTHOR_ACK1].send_time)
+    {
+        ble_frame_send_timer[BLE_AUTHOR_ACK1].send_timer++;
+        return;
+    }
+    else
+    {
+        author_ret_e             author_ret;             /*鉴权结果*/
+        uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.author_ret);
+        share_data_read(MESURE_INFO, mesure_offset, &author_ret, sizeof(author_ret_e));
 
-    ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
-    plain_data.plain_len = ble_frame_attribute[BLE_AUTHOR_ACK1].size;
-    plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
-    plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
-    plain_data.data[2] = ble_frame_attribute[BLE_AUTHOR_ACK1].cmd_num; /*报文命令字*/
-//    plain_data.data[3] = (uint8_t)author_ret; /*鉴权结果*/
-    plain_data.data[3] = GUN_DISCONNECTED;        /*鉴权结果*/
-    ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
+        ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
+        plain_data.plain_len = ble_frame_attribute[BLE_AUTHOR_ACK1].size;
+        plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
+        plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
+        plain_data.data[2] = ble_frame_attribute[BLE_AUTHOR_ACK1].cmd_num; /*报文命令字*/
+    //    plain_data.data[3] = (uint8_t)author_ret; /*鉴权结果*/
+        plain_data.data[3] = GUN_DISCONNECTED;        /*鉴权结果*/
+        ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
 
-    // 发送
-    uart_data_s ble_tx_data = {0};
-    ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
-    ble_tx_data.data[0] = frame_data.frame_head;
-    ble_tx_data.data[1] = frame_data.effective_len;
-    memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
-    ble_tx_data.data[2 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
-    ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
-    ble_tx_data.timeout = ble_tx_data.len;
-    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
+        // 发送
+        uart_data_s ble_tx_data = {0};
+        ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
+        ble_tx_data.data[0] = frame_data.frame_head;
+        ble_tx_data.data[1] = frame_data.effective_len;
+        memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
+        ble_tx_data.data[2 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
+        ble_tx_data.data[3 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
+        ble_tx_data.timeout = ble_tx_data.len;
+        uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
+        ble_frame_send_timer[BLE_AUTHOR_ACK1].send_timer = 0;
+    }
 }
 
 /*****************************************************************************************************
@@ -450,30 +459,40 @@ void protocol_tx_handle_auto_charge_ack(void)
         charger_arm_status_e     charger_arm_status;     /*机械臂运行状态*/
         arm_fail_reason_e        arm_fail_reason;        /*机械臂失败原因*/
     }auto_charge_ack;
-    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.vehicle_position);
-    share_data_read(MESURE_INFO, mesure_offset, &auto_charge_ack, sizeof(auto_charge_ack));
 
-    ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
-    plain_data.plain_len = ble_frame_attribute[BLE_AUTO_CHARGE_ACK].size;
-    plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
-    plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
-    plain_data.data[2] = ble_frame_attribute[BLE_AUTO_CHARGE_ACK].cmd_num; /*报文命令字*/
-    plain_data.data[3] = (uint8_t)auto_charge_ack.vehicle_position; /*车辆位置判断*/
-    plain_data.data[4] = (uint8_t)auto_charge_ack.charger_arm_status; /*机械臂运行状态*/
-    plain_data.data[5] = (uint8_t)auto_charge_ack.arm_fail_reason; /*机械臂失败原因*/
+    if(ble_frame_send_timer[BLE_AUTO_CHARGE_ACK].send_timer <= ble_frame_attribute[BLE_AUTO_CHARGE_ACK].send_time)
+    {
+        ble_frame_send_timer[BLE_AUTO_CHARGE_ACK].send_timer++;
+        return;
+    }
+    else
+    {
+        uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.vehicle_position);
+        share_data_read(MESURE_INFO, mesure_offset, &auto_charge_ack, sizeof(auto_charge_ack));
 
-    ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
+        ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
+        plain_data.plain_len = ble_frame_attribute[BLE_AUTO_CHARGE_ACK].size;
+        plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
+        plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
+        plain_data.data[2] = ble_frame_attribute[BLE_AUTO_CHARGE_ACK].cmd_num; /*报文命令字*/
+        plain_data.data[3] = (uint8_t)auto_charge_ack.vehicle_position; /*车辆位置判断*/
+        plain_data.data[4] = (uint8_t)auto_charge_ack.charger_arm_status; /*机械臂运行状态*/
+        plain_data.data[5] = (uint8_t)auto_charge_ack.arm_fail_reason; /*机械臂失败原因*/
 
-    // 发送
-    uart_data_s ble_tx_data = {0};
-    ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
-    ble_tx_data.data[0] = frame_data.frame_head;
-    ble_tx_data.data[1] = frame_data.effective_len;
-    memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
-    ble_tx_data.data[2 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
-    ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
-    ble_tx_data.timeout = ble_tx_data.len;
-    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
+        ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
+
+        // 发送
+        uart_data_s ble_tx_data = {0};
+        ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
+        ble_tx_data.data[0] = frame_data.frame_head;
+        ble_tx_data.data[1] = frame_data.effective_len;
+        memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
+        ble_tx_data.data[2 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
+        ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
+        ble_tx_data.timeout = ble_tx_data.len;
+        uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
+        ble_frame_send_timer[BLE_AUTO_CHARGE_ACK].send_timer = 0;
+    }
 }
 
 /*****************************************************************************************************
