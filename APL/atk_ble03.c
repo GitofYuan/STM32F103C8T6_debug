@@ -18,23 +18,26 @@
 
 /* ==============================  EXTERNS   =============================== */
 uint8_t ble_tx_buf[UART_DATA_MAX];      /*BLE03发送缓冲区，大小根据实际需求定义*/
-uint8_t ble_send_timer = 0;             /*BLE03发送计时器，单位ms*/
+uint16_t ble_send_timer = 0;             /*BLE03发送计时器，单位ms*/
 uart_data_s ble_rx_data = {0};      /*BLE03接收数据结构体*/
 
 enum
 {
-    BLE_INIT_IDLE = 0,
-    BLE_INIT_SPR0,
-    BLE_INIT_SBSW0,
-    BLE_INIT_SSSW0,
-    BLE_INIT_NAME_BLE,
-    BLE_INIT_NAME_SPP,
-    BLE_INIT_MAC,
-    BLE_INIT_UUID,
-    BLE_INIT_RESET,
-    BLE_INIT_SBSW1,
-    BLE_INIT_SSSW1,
-    BLE_INIT_COMPLETE,
+    BLE_INIT_IDLE = 0,    /*空闲*/
+    BLE_INIT_SPR0,        /*设置上电回传功能关闭*/
+    BLE_INIT_SBSW0,       /*关闭BLE*/
+    BLE_INIT_SSSW0,       /*关闭SPP*/
+    BLE_INIT_NAME_BLE,    /*设置BLE名称*/
+    BLE_INIT_NAME_SPP,    /*设置SPP名称*/
+    BLE_INIT_MAC,         /*设置BLEmac地址*/
+    BLE_INIT_UUID,        /*设置主UUID*/
+    BLE_INIT_UUID1,       /*设置特征码1*/
+    BLE_INIT_UUID2,       /*设置特征码2*/
+    BLE_INIT_UUID3,       /*设置特征码3*/
+    BLE_INIT_RESET,       /*复位*/
+    BLE_INIT_SBSW1,       /*开启BLE*/
+    BLE_INIT_SSSW1,       /*开启SPP*/
+    BLE_INIT_COMPLETE,    /*初始化完成*/
 }ble_init_state = BLE_INIT_IDLE;   /*BLE03初始化状态枚举*/    
 
 
@@ -103,7 +106,7 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 /*接收到的数据为“OK”*/
                 if(strcmp((char*)ble_rx_data.data, "OK\r\n") == 0)
                 {
-                    ble_init_state = BLE_INIT_SBSW0;
+                    ble_init_state = BLE_INIT_NAME_BLE;
                 }
                 else
                 {
@@ -112,6 +115,7 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
             break;
+            
         case BLE_INIT_SBSW0:
             /*初始化BLE03模块*/
             BLE03_SendCmd(BLE03_AT_SBSW0, NULL);
@@ -129,6 +133,7 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
             break;
+            
         case BLE_INIT_SSSW0:
             /*初始化BLE03模块*/
             BLE03_SendCmd(BLE03_AT_SSSW0, NULL);
@@ -146,6 +151,7 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
             break;
+            
         case BLE_INIT_NAME_BLE:
             /*设置BLE03模块名称*/
             BLE03_SendCmd(BLE03_AT_SBN, init_data->ble_name);
@@ -164,28 +170,10 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
             break;
+            
         case BLE_INIT_NAME_SPP:
             /*设置BLE03模块SPP名称*/
             BLE03_SendCmd(BLE03_AT_SSN, init_data->spp_name);
-            
-            if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
-            {
-                /*接收到的数据为“OK”*/
-                if(strcmp((char*)ble_rx_data.data, "OK\r\n") == 0)
-                {
-                    ble_init_state = BLE_INIT_MAC;
-                }
-                else
-                {
-                    printf("%.*s", ble_rx_data.len, (char*)ble_rx_data.data);
-                }
-                memset(&ble_rx_data, 0, sizeof(uart_data_s));
-            }
-            
-            break;
-        case BLE_INIT_MAC:
-            /*设置BLE03模块MAC地址*/
-            BLE03_SendCmd(BLE03_AT_SBMAC, init_data->ble_mac);
             
             if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
             {
@@ -196,15 +184,91 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    printf("%.*s", ble_rx_data.len, (char*)ble_rx_data.data);
+                }
+                memset(&ble_rx_data, 0, sizeof(uart_data_s));
+            }
+            break;
+            
+        case BLE_INIT_UUID:
+            /*设置BLE03模块UUID*/
+            BLE03_SendCmd(BLE03_AT_SU0, init_data->uuid);
+            
+            if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
+            {
+                /*接收到的数据为“OK”*/
+                if(strcmp((char*)ble_rx_data.data, "OK\r\n") == 0)
+                {
+                    ble_init_state = BLE_INIT_UUID1;
+                }
+                else
+                {
                     printf("%s",(char*)ble_rx_data.data);
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
-            
             break;
-        case BLE_INIT_UUID:
-            /*设置BLE03模块UUID*/
-            BLE03_SendCmd(BLE03_AT_SU0, init_data->uuid);
+       
+        case BLE_INIT_UUID1:
+            /*设置BLE03模块特征码1*/
+            BLE03_SendCmd(BLE03_AT_SU1, init_data->uuid1);
+            
+            if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
+            {
+                /*接收到的数据为“OK”*/
+                if(strcmp((char*)ble_rx_data.data, "OK\r\n") == 0)
+                {
+                    ble_init_state = BLE_INIT_UUID2;
+                }
+                else
+                {
+                    printf("%s",(char*)ble_rx_data.data);
+                }
+                memset(&ble_rx_data, 0, sizeof(uart_data_s));
+            }
+            break;
+            
+       case BLE_INIT_UUID2:
+            /*设置BLE03模块特征码1*/
+            BLE03_SendCmd(BLE03_AT_SU2, init_data->uuid2);
+            
+            if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
+            {
+                /*接收到的数据为“OK”*/
+                if(strcmp((char*)ble_rx_data.data, "OK\r\n") == 0)
+                {
+                    ble_init_state = BLE_INIT_UUID3;
+                }
+                else
+                {
+                    printf("%s",(char*)ble_rx_data.data);
+                }
+                memset(&ble_rx_data, 0, sizeof(uart_data_s));
+            }
+            break;
+            
+       case BLE_INIT_UUID3:
+            /*设置BLE03模块特征码1*/
+            BLE03_SendCmd(BLE03_AT_SU3, init_data->uuid3);
+            
+            if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
+            {
+                /*接收到的数据为“OK”*/
+                if(strcmp((char*)ble_rx_data.data, "OK\r\n") == 0)
+                {
+                    ble_init_state = BLE_INIT_MAC;
+                }
+                else
+                {
+                    printf("%s",(char*)ble_rx_data.data);
+                }
+                memset(&ble_rx_data, 0, sizeof(uart_data_s));
+            }
+            break;
+            
+       case BLE_INIT_MAC:
+            /*设置BLE03模块MAC地址*/
+            BLE03_SendCmd(BLE03_AT_SBMAC, init_data->ble_mac);
             
             if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
             {
@@ -220,9 +284,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
             break;
-       
+            
        case BLE_INIT_SBSW1:
-            /*设置BLE03模块UUID*/
+            /*开启BLE蓝牙*/
             BLE03_SendCmd(BLE03_AT_SBSW1, NULL);
             
             if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
@@ -239,8 +303,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
             break;
+            
         case BLE_INIT_SSSW1:
-            /*设置BLE03模块UUID*/
+            /*开启SPP蓝牙*/
             BLE03_SendCmd(BLE03_AT_SSSW1, NULL);
             
             if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
@@ -257,8 +322,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
             break;
+            
         case BLE_INIT_RESET:
-            /*设置BLE03模块UUID*/
+            /*重启*/
             BLE03_SendCmd(BLE03_AT_RESET, NULL);
             
             if(true == uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data))
@@ -275,6 +341,7 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
             break;
+            
         case BLE_INIT_COMPLETE:
             /*初始化完成*/
             printf("BLE03 initialization complete\r\n");

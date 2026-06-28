@@ -11,7 +11,7 @@
 #include "uart_bus.h"
 /* ==============================  DEFINES   =============================== */
 #define DEBUG_BLE03           /*debug使能，完整保留“DEBUG_BLE03”为使能debug*/
-#define BLE_SEND_INTERVAL      200     /*两帧之间发送的最小间隔 ms*/
+//#define BLE_SEND_INTERVAL      200     /*两帧之间发送的最小间隔 ms*/
 
 
 #define ZSC_RFPOWER99          "ZSC+RFPOWER:99\r\n"

@@ -1,9 +1,9 @@
 stm32f103c8t6_debug\voyah_ble.o: ..\APL\voyah_ble.c
 stm32f103c8t6_debug\voyah_ble.o: E:\Keil\ARM\ARMCC\Bin\..\include\string.h
 stm32f103c8t6_debug\voyah_ble.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdbool.h
+stm32f103c8t6_debug\voyah_ble.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 stm32f103c8t6_debug\voyah_ble.o: ..\APL\voyah_ble.h
 stm32f103c8t6_debug\voyah_ble.o: ..\MWL\share_data\share_data.h
-stm32f103c8t6_debug\voyah_ble.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 stm32f103c8t6_debug\voyah_ble.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 stm32f103c8t6_debug\voyah_ble.o: ..\MWL\share_data\share_data_can.h
 stm32f103c8t6_debug\voyah_ble.o: ..\MWL\share_data\share_data.h

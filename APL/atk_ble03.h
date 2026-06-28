@@ -49,6 +49,8 @@
 #define BLE03_AT_STXP           "AT+STXP%s\r\n"        // 发射功率 00~09
 #define BLE03_AT_SU0            "AT+SU0%s\r\n"      // 设置主UUID
 #define BLE03_AT_SU1            "AT+SU1%s\r\n"      // 设置特征UUID1
+#define BLE03_AT_SU2            "AT+SU2%s\r\n"      // 设置特征UUID2
+#define BLE03_AT_SU3            "AT+SU3%s\r\n"      // 设置特征UUID3
 /* ==============================   ENUMS    =============================== */
 
 /* ======================== STRUCTURES AND UNIONS ========================== */
@@ -57,7 +59,10 @@ typedef struct {
     uint8_t   ble_name[20];
     uint8_t   spp_name[20];
     uint8_t   ble_mac[13];
-    uint8_t   uuid[17];
+    uint8_t   uuid[5];
+    uint8_t   uuid1[5];
+    uint8_t   uuid2[5];
+    uint8_t   uuid3[5];
 } atk_ble03_init_data_t;
 /* ==============================  EXTERNS   =============================== */
 

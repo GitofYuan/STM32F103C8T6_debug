@@ -8,6 +8,7 @@
 /* ==============================  INCLUDES  =============================== */
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "voyah_ble.h"
 /* ==============================  DEFINES   =============================== */
 // 32位循环左移
@@ -81,10 +82,13 @@ static uint8_t ble_rx_buf[UART_DATA_MAX];      /*BLE03发送缓冲区，大小�
 bool ble_init_flag = false;   /*BLE03初始化标志位*/
 atk_ble03_init_data_t ble_init_data = 
 {
-    .ble_name = "BLE03",
-    .spp_name = "SPP03",
-    .ble_mac = {0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x00},
-    .uuid = "EEEE",
+    .ble_name = "VOYAHROBOT1234",
+    .spp_name = "VOYAHROBOT1234",
+    .ble_mac = "226644889922",
+    .uuid = "FF00",
+    .uuid1 = "FF01",
+    .uuid2 = "FF02",
+    .uuid3 = "FF03",
 };
 
 /* 车辆VIN码的唯一定义（避免在头文件中重复定义） */
@@ -117,7 +121,7 @@ void ble_gen_key(const uint8_t* vin, uint8_t key[AES_KEY_SIZE])
 uint8_t ble_pkcs7_pad(uint8_t* data, uint8_t data_len)
 {
     /*报文数据填充，有效数据不足16字节*N时，进行数据填充，填充方式为PKCS7*/
-    uint8_t pad_len = AES_KEY_SIZE - (data_len % AES_KEY_SIZE);
+    uint8_t pad_len = (data_len % AES_BLOCK_SIZE) ? (AES_BLOCK_SIZE - (data_len % AES_BLOCK_SIZE)) : AES_BLOCK_SIZE;
     for(uint8_t i = 0; i < pad_len; i++)
     {
         data[data_len + i] = pad_len;
@@ -194,7 +198,7 @@ static void aes_key_expand(const uint8_t *key, uint32_t *w)
 *****************************************************************************************************/
 static void aes_subbytes(uint8_t *state)
 {
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < AES_BLOCK_SIZE; i++)
     {
         state[i] = sbox[state[i]];
     }
@@ -374,7 +378,8 @@ void protocol_tx_handle_author_ack1(void)
     plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
     plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
     plain_data.data[2] = ble_frame_attribute[BLE_AUTHOR_ACK1].cmd_num; /*报文命令字*/
-    plain_data.data[3] = (uint8_t)author_ret; /*鉴权结果*/
+//    plain_data.data[3] = (uint8_t)author_ret; /*鉴权结果*/
+    plain_data.data[3] = GUN_DISCONNECTED;        /*鉴权结果*/
     ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
 
     // 发送
@@ -500,10 +505,10 @@ void ble_protocol_tx(void)
                 /* code */
                 break;
             case BLE_AUTHOR_ACK1:
-//                    protocol_tx_handle_author_ack1();
+                    protocol_tx_handle_author_ack1();
                 break;
             case BLE_AUTHOR_ACK2:
-                protocol_tx_handle_author_ack2();
+//                protocol_tx_handle_author_ack2();
                 break;
             case BLE_AUTO_CHARGE:
                 /* code */
@@ -666,22 +671,37 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
     uint8_t dec_buf[BT_MAX_ENC_LEN];
     int dec_len;
 
+    if (frame == NULL || vin == NULL || data == NULL)
+    {
+        return -3;
+    }
+
     // 1. 校验帧头
     if (frame->frame_head != BLE_FRAME_HEAD)
         return -1;
 
+    if (frame->encrypt_len > BT_MAX_ENC_LEN || frame->effective_len > BT_MAX_PLAIN_LEN)
+    {
+        return -2;
+    }
+
+    if ((frame->encrypt_len % AES_BLOCK_SIZE) != 0)
+    {
+        return -2;
+    }
+
     // 2. 校验CRC
     uint8_t crc_buf[1 + BT_MAX_ENC_LEN];
     crc_buf[0] = frame->effective_len;
-    memcpy(crc_buf + 1, frame->encrypt_data, BT_MAX_ENC_LEN);
-    if (ble_crc16_ibm(crc_buf, 1 + BT_MAX_ENC_LEN) != frame->check_num)
+    memcpy(crc_buf + 1, frame->encrypt_data, frame->encrypt_len);
+    if (ble_crc16_ibm(crc_buf, 1 + frame->encrypt_len) != frame->check_num)
     {
         return -2;
     }
 
     // 3. 解密
     ble_gen_key(vin, key);
-    dec_len = (frame->effective_len + AES_BLOCK_SIZE - 1) / AES_BLOCK_SIZE * AES_BLOCK_SIZE;
+    dec_len = frame->encrypt_len;
     for (int i = 0; i < dec_len; i += AES_BLOCK_SIZE)
         aes128_ecb_decrypt(frame->encrypt_data + i, dec_buf + i, key);
 
@@ -693,7 +713,9 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
     }
 
     // 5. 复制业务数据
-    memcpy(data, dec_buf, sizeof(ble_plain_t));
+    memset(data, 0, sizeof(*data));
+    data->plain_len = (uint8_t)dec_len;
+    memcpy(data->data, dec_buf, dec_len);
 
     return 0;
 }

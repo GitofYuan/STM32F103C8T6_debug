@@ -38,7 +38,7 @@ enum
 /*蓝牙鉴权结果*/
 typedef enum
 {
-    AUTHOR_RET_INIT = 0,                 /*初始化*/
+    AUTHOR_RET_INIT = 0,      /*初始化*/
     AUTHOR_SUCCESS,           /*鉴权成功*/
     AUTHOR_FAIL,              /*鉴权失败*/
     GUN_DISCONNECTED,         /*枪未连接*/
