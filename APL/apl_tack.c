@@ -57,6 +57,10 @@ void APL_Task(void *argument)
             if(key0_state > 100)
             {
                 // rf_command_send();
+                printf("start init BLE03\r\n");
+                uint8_t send_flag = 1;
+                uint32_t prot_offset = OFFSET_OF(control_info_t, ble_uart_control[BLE_AUTHOR_ACK1].send_flag);
+                share_data_write(CONTROL_INFO, prot_offset, &send_flag, sizeof(send_flag));
                 key0_state = 0;
             }
         }

@@ -22,7 +22,7 @@
 const ble_frame_attribute_t ble_frame_attribute[BLE_FRAME_MAX] = 
 {               /*           cmd_num       长度      默认发送周期  默认发送次数  临时发送周期  临时发送次数    */
     /*BLE_AUTHOR*/          { 0x01,        20,        250,        0xFFFF,      250,         0xFFFF     },
-    /*BLE_AUTHOR_ACK1*/     { 0x01,        4,         250,        0,           250,         0          },
+    /*BLE_AUTHOR_ACK1*/     { 0x01,        4,         250,        0xFFFF,           250,         0          },
     /*BLE_AUTHOR_ACK2*/     { 0x02,        5,         250,        0,           250,         0          },
     /*BLE_AUTO_CHARGE*/     { 0x03,        4,         250,        0xFFFF,      250,         0xFFFF     },
     /*BLE_AUTO_CHARGE_ACK*/ { 0x03,        6,         500,        0,           500,         0          },
@@ -94,6 +94,82 @@ atk_ble03_init_data_t ble_init_data =
 /* 车辆VIN码的唯一定义（避免在头文件中重复定义） */
 uint8_t VIN[17] = "LMMMMMMMMMMMM1102";   /*车辆VIN码，长度为17字节*/
 /* ========================= FUNCTION PROTOTYPES =========================== */
+/*****************************************************************************************************
+*Function   :voyah_ble_send_timer(蓝牙发送计时函数)
+*Description:先根据输入报文序号，先检查对应临时报文发送标志位是否被置位，如果被置位，则按照临时报文
+             发送规则进行计时，如果达到发送条件则反馈发送使能，如果没有被置位，则按照默认报文发送规则进行计时，如果达到发送
+             条件则反馈发送使能。
+*Input      :uint8_t frame_id                       报文序号（数组）
+*Output     :
+*Returns    :bool      true:达到发送条件  false:未达到发送条件
+*Note       :
+*****************************************************************************************************/
+bool voyah_ble_send_timer(uint8_t frame_id)
+{
+    bool ret = false;
+    /*从共享区读取临时报文发送标志位*/
+    uint8_t send_flag2 = 0;
+    uint32_t prot_offset = OFFSET_OF(control_info_t, ble_uart_control[frame_id].send_flag2);
+    share_data_read(CONTROL_INFO, prot_offset, &send_flag2, sizeof(send_flag2));
+
+    /*如果临时报文发送标志位被置位，则按照临时报文发送规则进行发送*/
+    if(send_flag2 == 1)
+    {
+        /*以下所有报文发送节点都是定时器为0，目的是为了检查到发送标志位置位后，尽可能第一时间发出报文*/
+        if(ble_frame_send_timer[frame_id].send_timer2 == 0)
+        {
+            ret = true;
+        }
+        /*这里也要注意下，在临时报文发送期间，默认发送计时器也要同步更新，为了确保临时报文发送期间，不影响默认报文的时间计算*/
+        ble_frame_send_timer[frame_id].send_timer++;
+        if(ble_frame_send_timer[frame_id].send_timer >= ble_frame_attribute[frame_id].send_cycle)
+        {
+            ble_frame_send_timer[frame_id].send_timer = 0;
+            ble_frame_send_timer[frame_id].send_count++;
+        }
+
+        ble_frame_send_timer[frame_id].send_timer2++;
+        if(ble_frame_send_timer[frame_id].send_timer2 >= ble_frame_attribute[frame_id].send_cycle2)
+        {
+            ble_frame_send_timer[frame_id].send_timer2 = 0;
+            ble_frame_send_timer[frame_id].send_count2++;
+            /*如果临时报文有规定有效的发送时间且到达，则取消临时报文发送 */
+            if(ble_frame_attribute[frame_id].send_time2 != 0xFFFF
+                && ble_frame_send_timer[frame_id].send_count2 >= ble_frame_attribute[frame_id].send_time2)
+            {
+                uint8_t send_flag2 = 0;
+                uint32_t prot_offset = OFFSET_OF(control_info_t, ble_uart_control[frame_id].send_flag2);
+                share_data_write(CONTROL_INFO, prot_offset, &send_flag2, sizeof(send_flag2));
+                ble_frame_send_timer[frame_id].send_count2 = 0;
+            }
+        }
+    }
+    /*如果临时报文发送标志位没有被置位，则按照默认报文发送规则进行发送*/
+    else 
+    {
+        if(ble_frame_send_timer[frame_id].send_timer == 0)
+        {
+            ret = true;
+        }
+        ble_frame_send_timer[frame_id].send_timer++;
+        if(ble_frame_send_timer[frame_id].send_timer >= ble_frame_attribute[frame_id].send_cycle)
+        {
+            ble_frame_send_timer[frame_id].send_timer = 0;
+            ble_frame_send_timer[frame_id].send_count++;
+            /*如果默认报文有规定有效的发送时间且到达，则取消默认报文发送 */
+            if(ble_frame_attribute[frame_id].send_time != 0xFFFF
+                && ble_frame_send_timer[frame_id].send_count >= ble_frame_attribute[frame_id].send_time)
+            {
+                uint8_t send_flag = 0;
+                uint32_t prot_offset = OFFSET_OF(control_info_t, ble_uart_control[frame_id].send_flag);
+                share_data_write(CONTROL_INFO, prot_offset, &send_flag, sizeof(send_flag));
+                ble_frame_send_timer[frame_id].send_count = 0;
+            }
+        }
+    }
+    return ret;
+}
+
 /*****************************************************************************************************
 *Function   :16字节密钥生成函数
 *Description:16字节密钥生成函数，前12字节为固定值，后4字节为VIN码的最后4字节
@@ -369,12 +445,7 @@ uint8_t ble_pack(const ble_plain_t *data, const uint8_t *vin, ble_frame_data_t *
 *****************************************************************************************************/
 void protocol_tx_handle_author_ack1(void)
 {
-    if(ble_frame_send_timer[BLE_AUTHOR_ACK1].send_timer <= ble_frame_attribute[BLE_AUTHOR_ACK1].send_time)
-    {
-        ble_frame_send_timer[BLE_AUTHOR_ACK1].send_timer++;
-        return;
-    }
-    else
+    if(true == voyah_ble_send_timer(BLE_AUTHOR_ACK1))
     {
         author_ret_e             author_ret;             /*鉴权结果*/
         uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.author_ret);
@@ -399,7 +470,6 @@ void protocol_tx_handle_author_ack1(void)
         ble_tx_data.data[3 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
         ble_tx_data.timeout = ble_tx_data.len;
         uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
-        ble_frame_send_timer[BLE_AUTHOR_ACK1].send_timer = 0;
     }
 }
 
@@ -516,7 +586,7 @@ void ble_protocol_tx(void)
     for(frame = 0; frame < BLE_FRAME_MAX; frame++)
     {
         uint8_t send_flag = control_info.ble_uart_control[frame].send_flag;
-        if(send_flag == 0)
+        if(send_flag == 1)
         {
             switch(frame)
             {

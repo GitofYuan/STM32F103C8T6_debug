@@ -185,7 +185,7 @@ static DeviceRuntimeInfo dev_list[MAX_DEVICE_CNT] =
     {DEV_TYPE_GPIO,   "key0",              false,       .hw_res.gpio={GPIOC, GPIO_PIN_13}},
     /*UART*/
     {DEV_TYPE_UART,   "usart1",            false,       .hw_res.uart={&huart1, USART1, UART_MODE_DMA_RX_TX, UART_TX_RX}},
-    {DEV_TYPE_UART,   "usart2",            false,       .hw_res.uart={&huart2, USART2, UART_MODE_POLLING, UART_TX_RX}},
+    {DEV_TYPE_UART,   "usart2",            false,       .hw_res.uart={&huart2, USART2, UART_MODE_DMA_TX, UART_TX_RX}},
     /*CAN*/
     {DEV_TYPE_CAN,    "can1",              false,       .hw_res.can={&hcan, CAN1, BAUD_CAN_250K}},
     /*ADC*/

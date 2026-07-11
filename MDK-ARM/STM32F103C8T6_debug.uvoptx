@@ -152,50 +152,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>465</LineNumber>
+          <LineNumber>208</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134244568</Address>
+          <Address>134245244</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\MWL\uart\uart_bus.c</Filename>
+          <Filename>..\BSP\uart_control.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32F103C8T6_debug\../MWL/uart/uart_bus.c\465</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>460</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134244560</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\MWL\uart\uart_bus.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32F103C8T6_debug\../MWL/uart/uart_bus.c\460</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>393</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134245528</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\MWL\uart\uart_bus.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32F103C8T6_debug\../MWL/uart/uart_bus.c\393</Expression>
+          <Expression>\\STM32F103C8T6_debug\../BSP/uart_control.c\208</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
