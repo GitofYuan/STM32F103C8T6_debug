@@ -10,7 +10,7 @@
 /* ==============================  INCLUDES  =============================== */
 #include "uart_bus.h"
 /* ==============================  DEFINES   =============================== */
-#define DEBUG_BLE03           /*debug使能，完整保留“DEBUG_BLE03”为使能debug*/
+#define disDEBUG_BLE03           /*debug使能，完整保留“DEBUG_BLE03”为使能debug*/
 #define BLE_SEND_INTERVAL      200     /*两帧之间发送的最小间隔 ms*/
 
 /* ATK-BLE03 AT指令集（自动带 \r\n） */

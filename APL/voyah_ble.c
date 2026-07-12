@@ -616,12 +616,12 @@ void ble_protocol_tx(void)
 
 /* ========================= 报文接收解析 =========================== */
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
+*Function   :voyah_ble报文内容解析
+*Description:输入解密后的报文内容，然后按照蓝牙协议，对报文内容进行解析，解析后的数据存入共享内存中
+*Input      :ble_plain_t *ble_plain  解密后的蓝牙报文内容结构体指针
 *Output     :
 *Returns    :
-*Note       :
+*Note       :由于尚未拿到蓝牙协议的详细内容，所以暂时不做报文解析，后续拿到协议后再进行报文解析
 *****************************************************************************************************/
 void frame_resolve(ble_plain_t *ble_plain)
 {
@@ -812,7 +812,9 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin)
     }
     else
     {
+        #ifdef DEBUG_VOYAH_BLE
         printf("ble_plain: %.*s\n", ble_plain.plain_len, ble_plain.data);
+        #endif
         frame_resolve(&ble_plain);
         return 0;
     }
@@ -825,7 +827,7 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin)
 *Input      :
 *Output     :
 *Returns    :
-*Note       :报文解析函数待完善，当前仅打印接收到的报文内容
+*Note       :
 *****************************************************************************************************/
 void ble_protocol_rx(void)
 {
@@ -835,7 +837,9 @@ void ble_protocol_rx(void)
     if(ble_rx_dequeue(&len, ble_rx_buf) == true)
     {
         /*接收到BLE数据，进行解析处理*/
-//        printf("recv voyah_ble: %.*s\n", len, ble_rx_buf);
+        #ifdef DEBUG_VOYAH_BLE
+        printf("recv voyah_ble: %.*s\n", len, ble_rx_buf);
+        #endif
         if(ble_rx_buf[0] == BLE_FRAME_HEAD)
         {
             frame_data.frame_head = ble_rx_buf[0];
@@ -880,8 +884,6 @@ void ble_protocol_handle_task(void)
             ble_protocol_rx();
             ble_protocol_tx();
         }
-
     }
-
 }
 /***************** (C)COPYRIGHT 2022 XXXXXXXX*****END OF FILE*****************/

@@ -60,13 +60,17 @@ void BLE03_SendCmd(const char *format, const uint8_t *param)
         if(param == NULL)
         {
             snprintf((char*)ble_tx_buf, UART_DATA_MAX, format);
+            #ifdef DEBUG_BLE03
             printf("%s\n",format);
+            #endif
         }
         else
         {
             // 拼接 AT 指令（format=模板，param=你的 uint8_t 数组）
             snprintf((char*)ble_tx_buf, UART_DATA_MAX, format, (char*)param);
+            #ifdef DEBUG_BLE03
             printf("%s\n",(char*)param);
+            #endif
         }
         
         // 发送
@@ -95,7 +99,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
     {
         case BLE_INIT_IDLE:
             /*初始化BLE03模块*/
+            #ifdef DEBUG_BLE03
             printf("start init BLE03\r\n");
+            #endif
             ble_init_state = BLE_INIT_SPR0;
             break;
         case BLE_INIT_SPR0:
@@ -110,7 +116,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -128,7 +136,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -146,7 +156,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -165,7 +177,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -184,7 +198,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%.*s", ble_rx_data.len, (char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -203,7 +219,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -222,7 +240,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -241,7 +261,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -260,7 +282,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -279,7 +303,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -298,7 +324,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -317,7 +345,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -336,7 +366,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
                 }
                 else
                 {
+                    #ifdef DEBUG_BLE03
                     printf("%s",(char*)ble_rx_data.data);
+                    #endif
                 }
                 memset(&ble_rx_data, 0, sizeof(uart_data_s));
             }
@@ -344,7 +376,9 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
             
         case BLE_INIT_COMPLETE:
             /*初始化完成*/
+            #ifdef DEBUG_BLE03
             printf("BLE03 initialization complete\r\n");
+            #endif
             ret = true;
             break;
     }
@@ -366,7 +400,9 @@ bool ble_rx_dequeue(uint8_t* len, uint8_t* data)
     uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data);
     if(ble_rx_data.len > 0)
     {
-//        printf("recv bt: %.*s\n", ble_rx_data.len, ble_rx_data.data);
+        #ifdef DEBUG_BLE03
+        printf("recv bt: %.*s\n", ble_rx_data.len, ble_rx_data.data);
+        #endif
         memcpy(data, ble_rx_data.data, ble_rx_data.len);
         *len = ble_rx_data.len;
         memset(&ble_rx_data, 0, sizeof(uart_data_s));

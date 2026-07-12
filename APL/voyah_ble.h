@@ -11,6 +11,8 @@
 #include "share_data.h"
 #include "atk_ble03.h"
 /* ==============================  DEFINES   =============================== */
+#define  DEBUG_VOYAH_BLE           /*debug使能，完整保留“DEBUG_VOYAH_BLE”为使能debug*/
+
 #define  VEHICLE_BLE_ADDR         0x01       /*车辆蓝牙协议地址*/
 #define  CHAEGER_BLE_ADDR         0x02       /*充电机蓝牙协议地址*/
 #define  BLE_FRAME_HEAD           0x68       /*蓝牙报文头*/
