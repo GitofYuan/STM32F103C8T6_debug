@@ -356,19 +356,19 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data)
 *Function   :
 *Description:
 *Input      :
-*Output     :
+*Output     :uint8_t len, uint8_t* data
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-bool ble_rx_dequeue(uint8_t len, uint8_t* data)
+bool ble_rx_dequeue(uint8_t* len, uint8_t* data)
 {
     bool ret = false;
     uart_rx_dequeue(UART_DATA_QUEUE_CHNL_1, &ble_rx_data);
     if(ble_rx_data.len > 0)
     {
-        printf("recv bt: %.*s\n", ble_rx_data.len, ble_rx_data.data);
+//        printf("recv bt: %.*s\n", ble_rx_data.len, ble_rx_data.data);
         memcpy(data, ble_rx_data.data, ble_rx_data.len);
-        len = ble_rx_data.len;
+        *len = ble_rx_data.len;
         memset(&ble_rx_data, 0, sizeof(uart_data_s));
         ret = true;
     }

@@ -92,7 +92,7 @@ atk_ble03_init_data_t ble_init_data =
 };
 
 /* 车辆VIN码的唯一定义（避免在头文件中重复定义） */
-uint8_t VIN[17] = "LMMMMMMMMMMMM1102";   /*车辆VIN码，长度为17字节*/
+uint8_t VIN[17] = "LGB320H84SW811102";   /*车辆VIN码，长度为17字节*/
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
 *Function   :voyah_ble_send_timer(蓝牙发送计时函数)
@@ -483,34 +483,37 @@ void protocol_tx_handle_author_ack1(void)
 *****************************************************************************************************/
 void protocol_tx_handle_author_ack2(void)
 {
-    struct
+    if(true == voyah_ble_send_timer(BLE_AUTHOR_ACK2))
     {
-        author_fail_reason_e     fail_reason;            /*鉴权失败原因*/
-        charger_device_type_e    device_type;            /*设备类型*/
-    }author_ack2;
-    uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.fail_reason);
-    share_data_read(MESURE_INFO, mesure_offset, &author_ack2, sizeof(author_ack2));
+        struct
+        {
+            author_fail_reason_e     fail_reason;            /*鉴权失败原因*/
+            charger_device_type_e    device_type;            /*设备类型*/
+        }author_ack2;
+        uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.fail_reason);
+        share_data_read(MESURE_INFO, mesure_offset, &author_ack2, sizeof(author_ack2));
 
-    ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
-    plain_data.plain_len = ble_frame_attribute[BLE_AUTHOR_ACK2].size;
-    plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
-    plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
-    plain_data.data[2] = ble_frame_attribute[BLE_AUTHOR_ACK2].cmd_num; /*报文命令字*/
-    plain_data.data[3] = (uint8_t)author_ack2.device_type; /*设备类型*/
-    plain_data.data[4] = (uint8_t)author_ack2.fail_reason; /*鉴权失败原因*/
+        ble_plain_t              plain_data;      /*蓝牙报文明文数据结构体*/
+        plain_data.plain_len = ble_frame_attribute[BLE_AUTHOR_ACK2].size;
+        plain_data.data[0] = CHAEGER_BLE_ADDR;    /*充电机蓝牙协议地址*/
+        plain_data.data[1] = VEHICLE_BLE_ADDR;    /*车辆蓝牙协议地址*/
+        plain_data.data[2] = ble_frame_attribute[BLE_AUTHOR_ACK2].cmd_num; /*报文命令字*/
+        plain_data.data[3] = (uint8_t)author_ack2.device_type; /*设备类型*/
+        plain_data.data[4] = (uint8_t)author_ack2.fail_reason; /*鉴权失败原因*/
 
-    ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
+        ble_frame_data_t         frame_data;      /*蓝牙报文最终发送数据结构体*/
 
-    // 发送
-    uart_data_s ble_tx_data = {0};
-    ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
-    ble_tx_data.data[0] = frame_data.frame_head;
-    ble_tx_data.data[1] = frame_data.effective_len;
-    memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
-    ble_tx_data.data[2 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
-    ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
-    ble_tx_data.timeout = ble_tx_data.len;
-    uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
+        // 发送
+        uart_data_s ble_tx_data = {0};
+        ble_tx_data.len = ble_pack(&plain_data, VIN, &frame_data);
+        ble_tx_data.data[0] = frame_data.frame_head;
+        ble_tx_data.data[1] = frame_data.effective_len;
+        memcpy(&ble_tx_data.data[2], frame_data.encrypt_data, frame_data.encrypt_len);
+        ble_tx_data.data[2 + frame_data.encrypt_len] = (frame_data.check_num >> 8) & 0xFF;
+        ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
+        ble_tx_data.timeout = ble_tx_data.len;
+        uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
+    }
 }
 
 /*****************************************************************************************************
@@ -523,20 +526,14 @@ void protocol_tx_handle_author_ack2(void)
 *****************************************************************************************************/
 void protocol_tx_handle_auto_charge_ack(void)
 {
-    struct
-    {
-        vehicle_position_e       vehicle_position;       /*车辆位置判断*/
-        charger_arm_status_e     charger_arm_status;     /*机械臂运行状态*/
-        arm_fail_reason_e        arm_fail_reason;        /*机械臂失败原因*/
-    }auto_charge_ack;
-
-    if(ble_frame_send_timer[BLE_AUTO_CHARGE_ACK].send_timer <= ble_frame_attribute[BLE_AUTO_CHARGE_ACK].send_time)
-    {
-        ble_frame_send_timer[BLE_AUTO_CHARGE_ACK].send_timer++;
-        return;
-    }
-    else
-    {
+    if(true == voyah_ble_send_timer(BLE_AUTO_CHARGE_ACK))
+    { 
+        struct
+        {
+            vehicle_position_e       vehicle_position;       /*车辆位置判断*/
+            charger_arm_status_e     charger_arm_status;     /*机械臂运行状态*/
+            arm_fail_reason_e        arm_fail_reason;        /*机械臂失败原因*/
+        }auto_charge_ack;
         uint32_t mesure_offset = OFFSET_OF(mesure_info_t, ble_frame.vehicle_position);
         share_data_read(MESURE_INFO, mesure_offset, &auto_charge_ack, sizeof(auto_charge_ack));
 
@@ -561,7 +558,6 @@ void protocol_tx_handle_auto_charge_ack(void)
         ble_tx_data.data[3 + frame_data.encrypt_len] = frame_data.check_num & 0xFF;
         ble_tx_data.timeout = ble_tx_data.len;
         uart_tx_enqueue(UART_DATA_QUEUE_CHNL_1, &ble_tx_data);
-        ble_frame_send_timer[BLE_AUTO_CHARGE_ACK].send_timer = 0;
     }
 }
 
@@ -594,16 +590,16 @@ void ble_protocol_tx(void)
                 /* code */
                 break;
             case BLE_AUTHOR_ACK1:
-                    protocol_tx_handle_author_ack1();
+                protocol_tx_handle_author_ack1();
                 break;
             case BLE_AUTHOR_ACK2:
-//                protocol_tx_handle_author_ack2();
+                protocol_tx_handle_author_ack2();
                 break;
             case BLE_AUTO_CHARGE:
                 /* code */
                 break;
             case BLE_AUTO_CHARGE_ACK:
-//                    protocol_tx_handle_auto_charge_ack();
+                protocol_tx_handle_auto_charge_ack();
                 break;
             
             default:
@@ -619,6 +615,19 @@ void ble_protocol_tx(void)
 }
 
 /* ========================= 报文接收解析 =========================== */
+/*****************************************************************************************************
+*Function   :
+*Description:
+*Input      :
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
+void frame_resolve(ble_plain_t *ble_plain)
+{
+
+}
+
 /*****************************************************************************************************
 *Function   :PKCS7数据去除填充函数
 *Description:去除报文数据的PKCS7填充
@@ -744,32 +753,31 @@ void aes128_ecb_decrypt(const uint8_t *in, uint8_t *out, const uint8_t *key)
 }
 
 /*****************************************************************************************************
-*Function   :ble_unpack（解析接收蓝牙报文）
+*Function   :ble_unpack（解秘接收蓝牙报文）
 *Description:先校验帧头是否为协议帧头，如是则继续，否则返回错误；然后进行CRC校验，如校验成功则继续，否则返回CRC校验失败；
              然后对数据进行解密，解密后对数据进行去填充，如去填充后的数据有效长度与传输的目标长度一致，则继续，
              否则返回长度错误；最后将解密后的数据复制到业务数据结构体中
 *Input      :const ble_frame_data_t *frame  接收到的蓝牙报文结构体指针
              const uint8_t *vin  车辆VIN码，长度为17字节
-*Output     :ble_plain_t *data   解密后的业务数据结构体指针
-*Returns    :0=成功，-1=帧头错误，-2=CRC错误，-3=长度错误
+*Output     :
+*Returns    :0=成功，-1=输入错误，-2=不符合协议，-3=数据解析错误
 *Note       :
 *****************************************************************************************************/
-int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *data)
+int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin)
 {
+    ble_plain_t ble_plain;
     uint8_t key[AES_KEY_SIZE];
-    uint8_t dec_buf[BT_MAX_ENC_LEN];
-    int dec_len;
 
-    if (frame == NULL || vin == NULL || data == NULL)
+    if (frame == NULL || vin == NULL)
     {
-        return -3;
+        return -1;
     }
 
     // 1. 校验帧头
     if (frame->frame_head != BLE_FRAME_HEAD)
-        return -1;
+        return -2;
 
-    if (frame->encrypt_len > BT_MAX_ENC_LEN || frame->effective_len > BT_MAX_PLAIN_LEN)
+    if (frame->effective_len > BT_MAX_PLAIN_LEN)
     {
         return -2;
     }
@@ -783,30 +791,31 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
     uint8_t crc_buf[1 + BT_MAX_ENC_LEN];
     crc_buf[0] = frame->effective_len;
     memcpy(crc_buf + 1, frame->encrypt_data, frame->encrypt_len);
-    if (ble_crc16_ibm(crc_buf, 1 + frame->encrypt_len) != frame->check_num)
+    uint16_t crc = ble_crc16_ibm(crc_buf, 1 + frame->encrypt_len);
+    if (crc != frame->check_num)
     {
         return -2;
     }
 
     // 3. 解密
     ble_gen_key(vin, key);
-    dec_len = frame->encrypt_len;
-    for (int i = 0; i < dec_len; i += AES_BLOCK_SIZE)
-        aes128_ecb_decrypt(frame->encrypt_data + i, dec_buf + i, key);
+    for (int i = 0; i < frame->encrypt_len; i += AES_BLOCK_SIZE)
+    {
+        aes128_ecb_decrypt(frame->encrypt_data + i, ble_plain.data + i, key);
+    }
 
     // 4. 去填充
-    dec_len = ble_pkcs7_unpad(dec_buf, dec_len);
-    if (dec_len != frame->effective_len)
+    ble_plain.plain_len = ble_pkcs7_unpad(ble_plain.data, frame->encrypt_len);
+    if (ble_plain.plain_len != frame->effective_len)
     {
         return -3;
     }
-
-    // 5. 复制业务数据
-    memset(data, 0, sizeof(*data));
-    data->plain_len = (uint8_t)dec_len;
-    memcpy(data->data, dec_buf, dec_len);
-
-    return 0;
+    else
+    {
+        printf("ble_plain: %.*s\n", ble_plain.plain_len, ble_plain.data);
+        frame_resolve(&ble_plain);
+        return 0;
+    }
 }
 
 /*****************************************************************************************************
@@ -820,17 +829,22 @@ int ble_unpack(const ble_frame_data_t *frame, const uint8_t *vin, ble_plain_t *d
 *****************************************************************************************************/
 void ble_protocol_rx(void)
 {
-    uint8_t len = 0;             /*报文长度*/
-    uint8_t effective_len = 0;   /*有效数据长度*/
-    if(ble_rx_dequeue(len, ble_rx_buf) == true)
+    uint8_t len = 0;   /*接收到的BLE数据长度*/
+    ble_frame_data_t frame_data;
+
+    if(ble_rx_dequeue(&len, ble_rx_buf) == true)
     {
         /*接收到BLE数据，进行解析处理*/
-        printf("recv bt: %.*s\n", len, ble_rx_buf);
+//        printf("recv voyah_ble: %.*s\n", len, ble_rx_buf);
         if(ble_rx_buf[0] == BLE_FRAME_HEAD)
         {
-            effective_len = ble_rx_buf[1];
+            frame_data.frame_head = ble_rx_buf[0];
+            frame_data.effective_len = ble_rx_buf[1];
+            memcpy(&frame_data.encrypt_data, ble_rx_buf + 2, len - 4);
+            frame_data.encrypt_len = len - 4;
+            frame_data.check_num = ble_rx_buf[len - 2] | (ble_rx_buf[len - 1] << 8);
             /*解析处理报文*/
-            // ble_unpack(&ble_rx_buf, VIN, &data);
+            ble_unpack(&frame_data, VIN);
         }
         else
         {

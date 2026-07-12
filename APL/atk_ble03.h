@@ -86,7 +86,7 @@ bool atk_ble03_init(atk_ble03_init_data_t *init_data);
 *Returns    :
 *Note       :
 *****************************************************************************************************/
-bool ble_rx_dequeue(uint8_t len, uint8_t* data);
+bool ble_rx_dequeue(uint8_t* len, uint8_t* data);
 
 /*****************************************************************************************************
 *Function   :

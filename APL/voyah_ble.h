@@ -43,7 +43,7 @@ typedef struct
     uint16_t  send_count2;       /*临时发送计数器*/
 }ble_frame_send_timer_t;
 
-/*BLE报文收发数据结构体（已加密）*/
+/*BLE报文收发数据结构体（未加密）*/
 typedef struct
 {
     uint8_t   plain_len;         /*有效数据长度*/
