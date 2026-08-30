@@ -23,14 +23,14 @@
 
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
-*Output     :
-*Returns    :
-*Note       :
+*Function   : find_device（设备查找函数）
+*Description: 根据设备类型和名称查找设备状态
+*Input      : dev_type - 设备类型
+*             dev_name - 设备名称
+*Output     : 找到的设备状态指针，未找到返回NULL
+*Returns    : bool  false/true  查找结果失败/成功
+*Note       : 该函数用于在设备列表中查找指定类型的设备
 *****************************************************************************************************/
-// 辅助函数：根据类型+名称查找设备状态
 static DeviceRuntimeInfo *find_device(device_type_e dev_type, const char *dev_name) 
 {
     if (dev_name == NULL) 
@@ -50,11 +50,14 @@ static DeviceRuntimeInfo *find_device(device_type_e dev_type, const char *dev_na
 
 // ====================== 核心接口实现 ======================
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
+*Function   :device_control（设备控制接口）
+*Description:根据设备类型、设备名称、控制类型和配置内容，执行相应的设备操作，包括打开、关闭、读取、写入和配置等。
+*Input      :device_type_e         dev_type   设备类型枚举值，指定要操作的设备类型（如GPIO、UART、CAN等）。
+             const char            *dev_name  设备名称字符串，指定要操作的具体设备。
+             device_ctrl_type_e    ctrl_type  控制类型枚举值，指定要执行的操作类型（如打开、关闭、读取、写入、配置等）。
+             device_ctrl_content_u *content   配置内容联合体指针，包含设备的相关参数和数据。
 *Output     :
-*Returns    :
+*Returns    :bool    false/true    操作失败/成功
 *Note       :
 *****************************************************************************************************/
 bool device_control(device_type_e dev_type, const char *dev_name, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content) 

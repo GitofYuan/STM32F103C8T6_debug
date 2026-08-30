@@ -88,7 +88,7 @@ void CAN_Task(void *argument)
 //            share_data_write(CONTROL_INFO, prot_offset, &send_flag, sizeof(send_flag));
 //        }
         can_protocol_handle_task();
-        J1939_handle_task();
+//        J1939_handle_task();  /*转BSP_Task任务中了，如果不行可以再转回来 */
         
   }
   /* USER CODE END CAN_Task */

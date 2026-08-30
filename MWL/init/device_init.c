@@ -28,6 +28,7 @@
 static uint8_t device_init_flag = 0;    /*设备初始化标志，0表示未初始化，1表示已初始化*/
 static uint16_t run_led_timer = 0;      /*运行指示灯定时器，单位为ms*/
 /* ==============================  EXTERNS   =============================== */
+/*GPIO初始化配置*/
 device_ctrl_content_u gpio_init_config[GPIO_DEV_NUM] = 
 {                           /*写入电平             初始电平          GPIO模式                  GPIO上下拉           GPIO输出速度*/  
 /*address1*/          {.gpio={GPIO_RESET,         GPIO_RESET,     INPUT,                    GPIO_PULL_NONE,      OUTPUT_LOW}},
@@ -46,6 +47,8 @@ device_ctrl_content_u gpio_init_config[GPIO_DEV_NUM] =
 /*led*/               {.gpio={GPIO_RESET,         GPIO_RESET,     OUTPUT_PUSH_PULL,         GPIO_PULL_NONE,      OUTPUT_LOW}},
 /*key0*/              {.gpio={GPIO_RESET,         GPIO_RESET,     INPUT,                    GPIO_PULL_NONE,      OUTPUT_LOW}},
 };
+
+/*GPIO序号列表*/
 const char *gpio_dev_list[GPIO_DEV_NUM] = 
 {
     "address1", "address2", "address3", "address4", "run_led", 
@@ -53,58 +56,73 @@ const char *gpio_dev_list[GPIO_DEV_NUM] =
     "iso_a0_ctrl", "relay_ctrl1", "relay_ctrl2", "led"
 };
 
+/*UART初始化配置*/
 device_ctrl_content_u uart_init_config[UART_DEV_NUM] = 
 {                     /*收发缓冲区   数据长度   超时时间    传输模式               收发模式       波特率        数据位          停止位         校验位*/  
 /*usart1*/      {.uart={0,           0,          0,          UART_MODE_DMA_RX_TX,  UART_TX_RX,   BAUD_115200,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
 /*usart2*/      {.uart={0,           0,          0,          UART_MODE_DMA_TX,     UART_TX_RX,   BAUD_9600,   DATA_BITS_8,   STOP_BITS_1,  PARITY_NONE}},
 };
+
+/*UART序号列表*/
 const char *uart_dev_list[UART_DEV_NUM] = 
 {
     "usart1", "usart2"
 };
 
+/*CAN初始化配置*/
 device_ctrl_content_u can_init_config[CAN_DEV_NUM] = 
 {                  /*canid     数据指针    数据长度    波特率*/  
 /*can1*/      {.can={0,         0,        0,        BAUD_CAN_250K}},
 };
+
+/*CAN序号列表*/
 const char *can_dev_list[CAN_DEV_NUM] = 
 {
     "can1"
 };
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
-*Function   :
-*Description:
+*Function   :all_device_init（所有外设初始化）
+*Description:按照外设类型、对应的外设列表以及初始化配置，依次调用device_control接口进行外设初始化。
 *Input      :
 *Output     :
 *Returns    :
-*Note       :
+*Note       :此函数是处于中间层，其实在运行此函数前，系统已按默认参数在驱动层初始化过一次了，
+             此函数的意义在于按照用户设定的参数重新初始化配置一次，一般在RTOS的任务中调用一次。
 *****************************************************************************************************/
 void all_device_init(void)
 {
+    /*GPIO初始化*/
     for(int i = 0; i < GPIO_DEV_NUM; i++)
     {
         device_control(DEV_TYPE_GPIO, gpio_dev_list[i], DEV_CTRL_OPEN, &gpio_init_config[i]);
     }
-
+    /*UART初始化*/
     for(int i = 0; i < UART_DEV_NUM; i++)
     {
         device_control(DEV_TYPE_UART, uart_dev_list[i], DEV_CTRL_OPEN, &uart_init_config[i]);
     }
-
+    /*CAN初始化*/
     for(int i = 0; i < CAN_DEV_NUM; i++)
     {
         device_control(DEV_TYPE_CAN, can_dev_list[i], DEV_CTRL_OPEN, &can_init_config[i]);
     }
+    /*ADC初始化*/
+
+    /*I2C初始化*/
+
+    /*SPI初始化*/
+
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
+*Function   :device_init（单个外设初始化）
+*Description:根据外设类型和名称，调用device_control接口进行外设初始化。
+*Input      :dev_type   外设类型
+             dev_name   外设名称（dev_name一定要与外设列表中的名称一致，不然会找不到）
 *Output     :
-*Returns    :
-*Note       :
+*Returns    :初始化结果
+*Note       :此函数一般在应用层执行时，需要改变某外设配置时调用，比如CAN波特率改变，或者UART波特率改变等。
 *****************************************************************************************************/
 bool device_init(device_type_e dev_type, const char *dev_name)
 {
@@ -147,16 +165,15 @@ bool device_init(device_type_e dev_type, const char *dev_name)
         default:
             return false;
     }
-    return false;
 }
 
 /*****************************************************************************************************
-*Function   :BSP_Task(驱动层任务)
+*Function   :BSP_Task(RTOS驱动层任务)
 *Description:负责进行设备初始化、系统运行指示灯控制以及调用支撑中间层功能正常运行的定时处理函数。
 *Input      :
 *Output     :
 *Returns    :
-*Note       :
+*Note       :该任务的配置优先级要高于其他任务，以保证运行指示灯控制和中间层功能运行的稳定性。
 *****************************************************************************************************/
 void BSP_Task(void *argument)
 {
@@ -165,7 +182,7 @@ void BSP_Task(void *argument)
     for(;;)
     {
         osDelay(1);
-        /*设备初始化*/
+        /*设备初始化，只在第一次运行时执行*/
         if(device_init_flag == 0)
         {
             all_device_init();
@@ -190,7 +207,7 @@ void BSP_Task(void *argument)
         }
 
         /*其他中间层任务处理*/
-        
+        J1939_handle_task();
         uart_tx_dequeue();
     }
     /* USER CODE END BSP_Task */

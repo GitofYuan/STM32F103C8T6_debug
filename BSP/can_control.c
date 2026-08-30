@@ -20,22 +20,23 @@
 /* ======================== STRUCTURES AND UNIONS ========================== */
 
 /* ==============================  EXTERNS   =============================== */
-extern CAN_HandleTypeDef hcan;
+extern CAN_HandleTypeDef hcan;    /*can.c中定义的CAN句柄*/
 
 /* ========================= FUNCTION PROTOTYPES =========================== */
 
 // ====================== CAN适配实现 ======================
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
+*Function   :can_stm32_init（can初始化）
+*Description:根据传入的设备信息和配置内容，初始化CAN外设。该函数主要用于在设备打开时进行CAN的初始化设置。
+*Input      :DeviceRuntimeInfo     *dev     设备运行时信息结构体指针，包含CAN句柄和实例等信息。
+             device_ctrl_content_u *content 配置内容联合体指针，包含CAN的波特率等配置参数。
 *Output     :
-*Returns    :
+*Returns    :bool    false/true    初始化失败/成功
 *Note       :
 *****************************************************************************************************/
 static bool can_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *content) 
 {
-    // 初始化CAN（默认250K，可后续通过control修改）
+    /* 初始化CAN（默认250K，可后续通过control修改）*/
     CAN_HandleTypeDef *can = dev->hw_res.can.hcan;
 
     /* CAN初始化参数配置 */
@@ -86,11 +87,13 @@ static bool can_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *conten
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
+*Function   :can_stm32_control（CAN控制接口）
+*Description:根据传入的设备信息、控制类型和配置内容，执行相应的CAN操作，包括打开、关闭、读取、写入和配置等。
+*Input      :DeviceRuntimeInfo     *dev       设备运行时信息结构体指针，包含CAN句柄和实例等信息。
+             device_ctrl_type_e    ctrl_type  控制类型枚举值，指定要执行的操作类型（如打开、关闭、读取、写入、配置等）。
+             device_ctrl_content_u *content   配置内容联合体指针，包含CAN的ID、数据、DLC和波特率等参数。
 *Output     :
-*Returns    :
+*Returns    :bool    false/true    操作失败/成功
 *Note       :
 *****************************************************************************************************/
 bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content) 
@@ -172,11 +175,12 @@ bool can_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, dev
 
 /*****************************************************************************************************
 *Function   :HAL_CAN_RxFifo0MsgPendingCallback（CAN接收完成回调函数重定义）
-*Description:
-*Input      :
+*Description:这是一个CAN接收完成的回调函数，当CAN接收到数据时，该函数会被调用。函数内部会将接收到的CAN数据
+             复制到自定义的can_bus结构体中，并将其入队到指定的CAN数据队列中，以便后续处理。
+*Input      :CAN_HandleTypeDef *hcan_t  指向CAN句柄的指针，用于标识接收数据的CAN实例。
 *Output     :
 *Returns    :
-*Note       :待完善
+*Note       :
 *****************************************************************************************************/
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan_t)
 {

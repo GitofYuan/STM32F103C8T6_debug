@@ -30,11 +30,12 @@ uint8_t uart1_rx_buf[UART_DATA_MAX] = {0};           /*UART1接收缓冲区，�
 
 // ====================== UART适配实现 ======================
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
+*Function   :uart_stm32_init（UART初始化函数）
+*Description:根据传入的设备信息和配置内容，初始化UART外设，包括波特率、数据位、停止位、校验位和收发模式等参数的配置。
+*Input      :DeviceRuntimeInfo     *dev       设备运行时信息结构体指针，包含UART句柄和实例等信息。
+             device_ctrl_content_u *content   配置内容联合体指针，包含UART的波特率、数据位、停止位、校验位和收发模式等参数。
 *Output     :
-*Returns    :
+*Returns    :bool    false/true    初始化失败/成功
 *Note       :本初始化函数是不会操作串口DMA和中断的初始化的，这个在系统底层搭建的时候配置好就行了。
 *****************************************************************************************************/
 static bool uart_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *content) 
@@ -137,11 +138,13 @@ static bool uart_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *conte
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
+*Function   :uart_stm32_control（UART控制接口）
+*Description:根据传入的设备信息、控制类型和配置内容，执行相应的UART操作，包括打开、关闭、读取、写入和配置等。
+*Input      :DeviceRuntimeInfo     *dev       设备运行时信息结构体指针，包含UART句柄和实例等信息。
+             device_ctrl_type_e    ctrl_type  控制类型枚举值，指定要执行的操作类型（如打开、关闭、读取、写入、配置等）。
+             device_ctrl_content_u *content   配置内容联合体指针，包含UART的波特率、数据位、停止位、校验位和收发模式等参数。
 *Output     :
-*Returns    :
+*Returns    :bool    false/true    操作失败/成功
 *Note       :
 *****************************************************************************************************/
 bool uart_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content) 
@@ -280,10 +283,15 @@ void USART1_IRQHandler(void)
     HAL_UART_IRQHandler(&huart1);
 }
 
-/**
- * HAL UART Tx complete callback (called from HAL IRQ handler).
- * Forward to uart bus to handle queue removal and start next send.
- */
+/*****************************************************************************************************
+*Function   :HAL_UART_TxCpltCallback（UART发送完成回调函数）
+*Description:该函数是HAL库提供的UART发送完成回调函数，当UART发送完成时会被调用。
+             在这里，我们将其转发到uart_bus模块的回调处理函数uart_dma_tx_complete，以便在UART发送完成后进行队列管理和下一次发送的启动。
+*Input      :UART_HandleTypeDef *huart  UART句柄
+*Output     :
+*Returns    :
+*Note       :
+*****************************************************************************************************/
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     /* 转发到 uart_bus 的回调处理（最小工作量，uart_bus 会在 IRQ 上做原子出队操作） */

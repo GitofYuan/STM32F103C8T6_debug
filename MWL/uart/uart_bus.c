@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include "uart_bus.h"
 
-
 /* ==============================  DEFINES   =============================== */
 
 /* ==============================   ENUMS    =============================== */
@@ -39,13 +38,12 @@ uart_data_pointer_s    s_uart_tx_data_pointer[UART_DATA_CHNL_NUM_MAX];          
 
 uint8_t uart_addr[UART_DATA_CHNL_NUM_MAX] = {0};   /*各UART通道的设备地址*/
 
-static uint8_t print_buf[UART_DATA_MAX] = {0};
-static uint8_t print_len = 0;
+static uint8_t print_buf[UART_DATA_MAX] = {0};     /*打印缓冲区*/
+static uint8_t print_len = 0;                      /*打印长度*/
 
-/* Per-channel busy flag when DMA transfer in progress */
+/* UART通道的忙标志位，用于表示当前该通道正在执行 DMA 传输 */
 static volatile uint8_t s_uart_tx_busy[UART_DATA_CHNL_NUM_MAX] = {0};
 
-//int fputc(int ch,FILE *f);
 /* ========================= FUNCTION PROTOTYPES =========================== */
 /*****************************************************************************************************
 *Function   :uart_bus_addr_init(各UART通道设备地址初始化)
@@ -410,16 +408,16 @@ void uart_tx_dequeue(void)
 
 /*****************************************************************************************************
 *Function   :uart_dma_tx_complete（DMA发送完成回调函数）
-*Description:
+*Description:该函数在DMA发送完成时调用，用于处理发送完成，并清空发送队列。
+             首先找到对应的UART通道，然后禁用中断，目的是防止入队出队同时被执行造成数据混乱；
+             如果队列为空，则直接返回；
+             如果队列非空，则再判断当前是否只有一组数据，如果是，则出队后清空队列头尾指针；如不是，则正常出队。
+             恢复中断。
 *Input      :UART_HandleTypeDef *huart  UART句柄
 *Output     :
 *Returns    :
 *Note       :该函数在DMA发送完成时调用，用于处理发送完成，并清空发送队列。
 *****************************************************************************************************/
-/**
- * Called from HAL UART Tx complete callback (IRQ context).
- * Performs minimal, atomic queue removal and clears busy flag for the channel.
- */
 void uart_dma_tx_complete(UART_HandleTypeDef *huart)
 {
     /* 找到对应的通道 */
@@ -473,11 +471,12 @@ void uart_dma_tx_complete(UART_HandleTypeDef *huart)
 
 /*****************************************************************************************************
 *Function   :fputc（prtinf函数重定向）
-*Description:将数据先同一存入print_buf数组内，待数据填充完成或数组填满，再统一进行串口发送入队，这样确保
+*Description:将数据先统一存入print_buf数组内，待数据填充完成或数组填满，再统一进行串口发送入队，这样确保
              打印数据不会出现瞬时阻塞的情况。
-*Input      :
+*Input      :int ch  要打印的字符
+             FILE *f  文件指针
 *Output     :
-*Returns    :
+*Returns    :int ch  返回打印的字符
 *Note       :1、打印字符串长度受宏定义UART_DATA_MAX限制；2、由于使用UTF-8编译，所以不能打印中文。
 *****************************************************************************************************/
 int fputc(int ch,FILE *f)

@@ -21,10 +21,11 @@
 // ====================== GPIO适配实现 ======================
 /*****************************************************************************************************
 *Function   :gpio_stm32_init（GPIO初始化函数）
-*Description:
-*Input      :
+*Description:根据传入的设备信息和配置内容，初始化GPIO外设。该函数主要用于在设备打开时进行GPIO的初始化设置。
+*Input      :DeviceRuntimeInfo     *dev     设备运行时信息结构体指针，包含GPIO端口和引脚等信息。
+             device_ctrl_content_u *content 配置内容联合体指针，包含GPIO的模式、上下拉、速度和电平等参数。
 *Output     :
-*Returns    :
+*Returns    :bool    false/true    初始化失败/成功
 *Note       :
 *****************************************************************************************************/
 static bool gpio_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *content) 
@@ -93,11 +94,13 @@ static bool gpio_stm32_init(DeviceRuntimeInfo *dev, device_ctrl_content_u *conte
 }
 
 /*****************************************************************************************************
-*Function   :
-*Description:
-*Input      :
+*Function   :gpio_stm32_control（GPIO控制接口）
+*Description:根据传入的设备信息、控制类型和配置内容，执行相应的GPIO操作，包括打开、关闭、读取、写入和配置等。
+*Input      :DeviceRuntimeInfo     *dev     设备运行时信息结构体指针，包含GPIO端口和引脚等信息。
+             device_ctrl_type_e    ctrl_type  控制类型枚举值，指定要执行的操作类型（如打开、关闭、读取、写入、配置等）。
+             device_ctrl_content_u *content   配置内容联合体指针，包含GPIO的模式、上下拉、速度和电平等参数。
 *Output     :
-*Returns    :
+*Returns    :bool    false/true    操作失败/成功
 *Note       :
 *****************************************************************************************************/
 bool gpio_stm32_control(DeviceRuntimeInfo *dev, device_ctrl_type_e ctrl_type, device_ctrl_content_u *content) 
